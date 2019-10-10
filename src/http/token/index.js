@@ -1,4 +1,4 @@
-module.exports = (req, res) => {
+exports.token = (req, res) => {
     console.log(req)
     
     if (req.method !== 'POST') {
