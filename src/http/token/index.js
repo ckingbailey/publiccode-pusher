@@ -1,6 +1,4 @@
 exports.token = (req, res) => {
-    console.log(req)
-    
     if (req.method !== 'POST') {
         return res.status(405).send('nop')
     }
