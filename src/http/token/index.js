@@ -9,9 +9,8 @@ exports.token = async (req, res) => {
 
     let gh = new ghClient(process.env.GH_CLIENT_ID, process.env.GH_CLIENT_SECRET)
 
-    let access_token, error
     try {
-        { access_token, error } = await gh.getToken(req.body.code)
+        var { access_token, error } = await gh.getToken(req.body.code)
 
         if (error) throw error
     } catch (error) {
