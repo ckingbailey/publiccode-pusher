@@ -1,6 +1,6 @@
 let express = require('express')
-let qs = require('qs')
-let { token } = require('./token')
+let { token } = require('./src/http/token')
+require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
 

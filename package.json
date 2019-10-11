@@ -1,0 +1,19 @@
+{
+  "name": "@github-commit-schema/main",
+  "version": "1.0.0",
+  "description": "development server to run  gcloud functions for brigade-project-index github-commit-schema",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "ckb",
+  "license": "GPL-3.0"
+}

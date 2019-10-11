@@ -17,8 +17,8 @@ export default function GithubClient(clientId) {
     }
 
     async function getToken(code) {
-        let url = 'https://github.com/login/oauth/access_token'
-        let body = `client_id=${client_id}&code=${code}&client_secret=`
+        let url = 'https://us-central1-github-commit-schema.cloudfunctions.net/token'
+        let body = `code=${code}`
         try {
             let response = await fetch(url, {
                 method: 'POST',
