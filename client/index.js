@@ -3,14 +3,22 @@ import GithubClient from './GithubClient.js'
 const client = new GithubClient('8390933a81635970d3b6')
 let qs = queryStringToObj(window.location.search)
 
+qs && console.log(qs.state, localStorage.getItem('ghStateToken'))
 if (qs
     && 'state' in qs
-    && qs.state !== null
-    && qs.state === window.localStorage.getItem('state')
-    && 'code' in  qs)
+    && 'code' in  qs
+    && qs.state === localStorage.getItem('ghStateToken'))
 {
+    console.log('state matches')
     // use code to request token
     client.getToken(qs.code)
+    .then(res => {
+        console.log(res)
+        let { access_token } = res
+        return access_token && localStorage.setItem('ghToken', access_token)
+    }).catch(er => {
+        console.error(er)
+    })
 } else {
     client.appendStateToAnchor('gh-login')
 }

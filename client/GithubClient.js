@@ -1,11 +1,16 @@
 export default function GithubClient(clientId) {
+    let state
+
     function generateState() {
-        return btoa(Date.now() * Math.random()) + btoa(Date.now() - Math.random())
+        state = btoa(Date.now() * Math.random()) + btoa(Date.now() - Math.random())
+        state = state.replace(/[\W_]/g, '')
+        console.log('generate new state', state)
+        return state
     }
 
     function appendStateToAnchor(id) {
         let a = document.getElementById(id)
-        let state = generateState()
+        state = generateState()
         let href = `${a.getAttribute('href')}&state=${state}`
         a.setAttribute('href', href)
         storeStateString(state)
@@ -17,18 +22,23 @@ export default function GithubClient(clientId) {
     }
 
     async function getToken(code) {
-        let url = 'https://us-central1-github-commit-schema.cloudfunctions.net/token'
-        let body = `code=${code}`
+        let url = 'http://localhost:3000/token'
+        // let url = 'https://us-central1-github-commit-schema.cloudfunctions.net/token'
+        state = state || localStorage.getItem('ghStateToken')
+        let body = `code=${code}&state=${state}`
         try {
             let response = await fetch(url, {
                 method: 'POST',
-                headers: { Accept: 'application/json' },
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                mode: 'cors',
                 body
             })
-            return (await response.json()).access_token
-        } catch (er) {
-            console.error(err)
-            return null
+            return await response.json()
+        } catch (error) {
+            throw error
         }
     }
 

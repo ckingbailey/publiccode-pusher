@@ -1,6 +1,7 @@
 let ghClient = require('github-client')
 
 exports.token = async (req, res) => {
+    console.log(req.body)
     if (req.method !== 'POST')
         return res.status(405).send('nop')
 
@@ -9,15 +10,16 @@ exports.token = async (req, res) => {
 
     let gh = new ghClient(process.env.GH_CLIENT_ID, process.env.GH_CLIENT_SECRET)
 
+    let response
     try {
-        var { access_token, error } = await gh.getToken(req.body.code)
+        response = await gh.getToken(req.body.code)
+        console.log('token returned from gh-client', response.access_token)
 
-        if (error) throw error
+        if (response.error) throw response.error
     } catch (error) {
         console.error(error)
         return res.status(500).send('something went wrong')
     }
 
-
-    res.json(access_token)
+    res.json(response)
 }
