@@ -77,7 +77,6 @@ function GithubClient(token) {
 GithubClient.generateState = function() {
     let stateToken = btoa(Date.now() * Math.random()) + btoa(Date.now() - Math.random())
     stateToken = stateToken.replace(/[\W_]/g, '')
-    console.log('generate new state', stateToken)
     return stateToken
 }
 
