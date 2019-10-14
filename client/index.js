@@ -1,50 +1,131 @@
+import Login from './components/Login.js'
+import Form from './components/Form.js'
 import GithubClient from './GithubClient.js'
+import qs from './querystring.js'
 
-(function() {
-    const client = new GithubClient('8390933a81635970d3b6')
-    let qs = queryStringToObj(window.location.search)
+new (function() {
+    const CLIENT_ID = '8390933a81635970d3b6'
+    let root = document.getElementById('main')
+    let state = {
+        token: null,
+        username: null,
+        authorization: 'LOGGED_OUT',
+        stateToken: null,
+        code: null,
+        warning: null,
+        error: null
+    }
+
+    setState(determineAuthState(state))
+    console.log(state)
+
+    handleAuthState(state)
+
+    render(
+        state.authorization === 'LOGGED_IN'
+        ? [ new Form({
+            warning: { ...state.warning },
+            username: state.username,
+            repos: state.repos
+        }) ]
+        : [ new Login({
+            error: state.error,
+            client_id: CLIENT_ID,
+            state: state.stateToken
+        }) ]
+    )
+
+    function determineAuthState({ token }) {
+        token = token || localStorage.getItem('token')
+        if (token)
+            return {
+                token,
+                authorization: 'LOGGED_IN'
+            }
+
+        // if no token, check for pending authorization
+        let { state, code } = qs.parse()
+        if (state
+            && code
+            && state === localStorage.getItem('ghStateToken'))
+        {
+            return {
+                state,
+                code,
+                authorization: 'PENDING'
+            }
+        }
+
+        else return { authorization: 'LOGGED_OUT'}
+    }
+
+    function handleAuthState({ authorization, token, code, stateToken }) {
+        switch (authorization) {
+            case 'LOGGED_IN':
+                return handleLoggedInState(token)
+            case 'PENDING':
+                return handlePendingAuthorization(code, stateToken)
+            default:
+                return handlePrepareLogin()
+        }
+    }
+
+    function handlePrepareLogin() {
+        let stateToken = GithubClient.generateState()
+        setState({ stateToken })
+        localStorage.setItem('ghStateToken', stateToken)
+    }
+
+    async function handlePendingAuthorization(code, stateToken) {
+        try {
+            let { access_token } = await new GithubClient().get('token', {
+                code,
+                stateToken
+            })
+            setState({ token: access_token })
+            localStorage.setItem('token', access_token)
+        } catch (error) {
+            console.error(error)
+            setState({
+                error,
+                authorization: 'LOGGED_OUT'
+            })
+        }
+    }
     
-    // qs && console.log(qs.state, localStorage.getItem('ghStateToken'))
+    async function handleLoggedInState(token) {
+        try {
+            let ghClient = new GithubClient(token)
+            let { login } = await ghClient.get('user')
+            let repos = await ghClient.get('repos')
+            setState({
+                username: login,
+                repos
+            })
+        } catch (error) {
+            console.error(error)
+            if (error.message === 'Requires authentication') {
+                setState({ warning: {
+                        message: 'The application cannot read your repositories \
+                        because it does not have access to the necessary scopes. \
+                        Please consider logging in again and acceptiing \
+                        "user" and "public_repo" scopes.',
+                        suggestion: 'REAUTHORIZE'
+                }})
+            }
+        }
+    }
 
-    if (qs
-        && 'state' in qs
-        && 'code' in  qs
-        && qs.state === localStorage.getItem('ghStateToken')
-        && !localStorage.getItem('ghToken'))
-    {
-        console.log('state matches')
-        // use code to request token
-        client.getToken(qs.code)
-        .then(res => {
-            console.log(res)
-            let { access_token } = res
-            return access_token && localStorage.setItem('ghToken', access_token)
-        }).catch(er => {
-            console.error(er)
-        })
-    } else if (localStorage.getItem('ghToken')) {
-        let main = document.getElementById('main')
-        let loginBtn = document.getElementById('gh-login')
-        let h1 = document.createElement('h1')
-        h1.innerText = 'Hi GH user (I gotta figure out how to retrieve your name)'
-        main.removeChild(loginBtn)
-        main.appendChild(h1)
-    } else {
-        client.appendStateToAnchor('gh-login')
+    function render(components) {
+        for (let component of components) {
+            root.appendChild(component)
+        }
+    }
+    
+    function setState(updateState) {
+        return {
+            ...state,
+            ...updateState
+        }
     }
 })()
-
-// only takes simple query strings in the shape like
-// ?xxx=yyy&aaa=bbb
-function queryStringToObj(qs) {
-    if (!qs) return qs
-    if (qs.startsWith('?')) qs = qs.slice(1)
-    if (!qs) return qs
-
-    let pieces = qs.split('&')
-    return pieces.reduce((obj, piece) => {
-        let [ key, val ] = piece.split('=')
-        obj[key] = val
-        return obj
-    }, {})
-}
