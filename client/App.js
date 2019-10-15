@@ -5,10 +5,10 @@ import GithubClient from './GithubClient.js'
 import qs from './querystring.js'
 
 function App(root) {
-    function createChildren({ authorization, username, repos, stateToken, code }) {
+    function createChildren({ authorization, username, repos, stateToken, code, warningSuggestion }) {
         switch (authorization) {
             case 'LOGGED_IN':
-                return [ new Form({ username, repos }) ]
+                return [ new Form({ username, repos, warning: warningSuggestion }) ]
             case 'LOGGED_OUT':
                 return [ new Login({ stateToken, code }) ]
             case 'PENDING':
@@ -88,6 +88,13 @@ function App(root) {
                 }
             } catch (error) {
                 console.error(error)
+                this.state = {
+                    ...this.state,
+                    warningMessage: error.message,
+                    warningSuggestion: 'Could not retrieve your repos.'
+                    + ' Please consider logging in again'
+                    + ' and approving "user:read" and "public_repo" scopes'
+                }
             }
 
             return this
