@@ -1,17 +1,17 @@
-export default function Login({ client_id, state }) {
-    let scope = 'public_repo%20user:read'
+export default function Login({ text, id, client_id, stateToken }) {
+    let scope = 'public_repo%20read:user'
     let a = document.createElement('a')
     
-    a.id = 'gh-login'
+    a.id = id
     
-    a.setAttribute('href', 'https://github.com/login/oauth/authorize/client_id='
+    a.setAttribute('href', 'https://github.com/login/oauth/authorize?client_id='
     + client_id
     + '&scope='
     + scope
     + '&state='
-    + state)
+    + stateToken)
 
-    a.innerText = 'Login to Github'
+    a.innerText = text
 
     return a
 }

@@ -1,16 +1,48 @@
 import Login from './components/Login.js'
 import Form from './components/Form.js'
+import Banner from './components/Banner.js'
 import Loading from './components/Loading.js'
 import GithubClient from './GithubClient.js'
 import qs from './querystring.js'
 
 function App(root) {
-    function createChildren({ authorization, username, repos, stateToken, code, warningSuggestion }) {
+    const client_id = '8390933a81635970d3b6'
+
+    function createChildren({
+        authorization,
+        username,
+        repos,
+        stateToken,
+        code,
+        warningSuggestion
+    }) {
         switch (authorization) {
             case 'LOGGED_IN':
-                return [ new Form({ username, repos, warning: warningSuggestion }) ]
+                let components = [ new Form({ username, repos }) ]
+                if (warningSuggestion)
+                    components.unshift(
+                        new Banner({
+                            type: 'warning',
+                            text: warningSuggestion
+                        },
+                            [ new Login({
+                                text: 'Login in again',
+                                id: 'gh-login',
+                                client_id,
+                                stateToken,
+                                code
+                            }) ]
+                        )
+                    )
+                return components
             case 'LOGGED_OUT':
-                return [ new Login({ stateToken, code }) ]
+                return [ new Login({
+                    text: 'Login to Github',
+                    id: 'gh-login',
+                    client_id,
+                    stateToken,
+                    code
+                }) ]
             case 'PENDING':
                 return [ new Loading() ]
             default:
@@ -88,8 +120,12 @@ function App(root) {
                 }
             } catch (error) {
                 console.error(error)
+                let stateToken = GithubClient.generateState()
+                localStorage.setItem('ghStateToken', stateToken)
+
                 this.state = {
                     ...this.state,
+                    stateToken,
                     warningMessage: error.message,
                     warningSuggestion: 'Could not retrieve your repos.'
                     + ' Please consider logging in again'
