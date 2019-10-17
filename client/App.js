@@ -68,10 +68,13 @@ function App(root) {
 
         // if no token, check for state and code
         let { state, code } = qs.parse()
+        console.log(state, code)
         if (state
             && code
-            && state === localStorage.getItem('state'))
+            && state === localStorage.getItem('ghStateToken'))
         {
+            console.log(localStorage.getItem('ghStateToken'))
+            console.log('determine auth state is PENDING')
             return {
                 authorization: 'PENDING',
                 stateToken: state,
@@ -80,6 +83,51 @@ function App(root) {
         }
 
         else return { authorization: 'LOGGED_OUT' }
+    }
+
+    async function handleAuthState({ authorization, stateToken, code }) {
+        switch (authorization) {
+            case 'PENDING':
+                console.log('case PENDING')
+                try {
+                    return await (new GithubClient()).get('token', { stateToken, code })
+                } catch (error) {
+                    console.error(error)
+                    return {
+                        error: error.message,
+                        authorization: 'LOGGED_OUT'
+                    }
+                }
+            case 'LOGGED_IN':
+                try {
+                    let { username, repos } = await retrieveUserData(this.state)
+    
+                    return {
+                        username,
+                        repos
+                    }
+                } catch (error) {
+                    console.error(error)
+                    let stateToken = GithubClient.generateState()
+                    localStorage.setItem('ghStateToken', stateToken)
+                    localStorage.removeItem('token')
+    
+                    return {
+                        stateToken,
+                        warningMessage: error.message,
+                        warningSuggestion: 'Could not retrieve your repos.'
+                        + ' Please consider logging in again'
+                        + ' and approving "user:read" and "public_repo" scopes'
+                    }
+                }
+            case 'LOGGED_OUT': {
+                console.log('case LOGGED_OUT')
+                let stateToken = GithubClient.generateState()
+                localStorage.setItem('ghStateToken', stateToken)
+
+                return { stateToken }
+            }
+        }
     }
 
     async function retrieveUserData({ token }) {
@@ -110,28 +158,7 @@ function App(root) {
                 ...authState
             }
 
-            try {
-                let { username, repos } = await retrieveUserData(this.state)
-
-                this.state = {
-                    ...this.state,
-                    username,
-                    repos
-                }
-            } catch (error) {
-                console.error(error)
-                let stateToken = GithubClient.generateState()
-                localStorage.setItem('ghStateToken', stateToken)
-
-                this.state = {
-                    ...this.state,
-                    stateToken,
-                    warningMessage: error.message,
-                    warningSuggestion: 'Could not retrieve your repos.'
-                    + ' Please consider logging in again'
-                    + ' and approving "user:read" and "public_repo" scopes'
-                }
-            }
+            let result = await handleAuthState(this.state)
 
             return this
         },

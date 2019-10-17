@@ -4,12 +4,13 @@ function GithubClient(token) {
     return { get }
 
     async function get(param, data) {
-        let { url, options } = endpoints(param)
+        let { url, options } = endpoints(param, data)
         // const TOKEN = localStorage.getItem('ghToken')
         
         if (options.Authorization && options.Authorization === 'token')
             options.Authorization += ` ${token}`
 
+        console.log(url, options)
         let response = await fetch(url, options)
 
         if (response.status !== 200) {
@@ -51,7 +52,10 @@ function GithubClient(token) {
                     url: 'http://localhost:3000/token',
                     options: {
                         method: 'POST',
-                        body: `code=${params.code}&state=${params.state}`
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `code=${params.code}&state=${params.stateToken}`
                     }
                 }
             case 'user':
