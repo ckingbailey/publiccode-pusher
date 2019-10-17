@@ -66,7 +66,7 @@ function App(root) {
             }
         }
 
-        // if no token, check for state and code
+        // if no token, check for state and code in querystring
         let { state, code } = qs.parse()
         console.log(state, code)
         if (state
@@ -93,7 +93,10 @@ function App(root) {
                     return await (new GithubClient()).get('token', { stateToken, code })
                 } catch (error) {
                     console.error(error)
+                    localStorage.removeItem('ghStateToken')
                     return {
+                        stateToken: null,
+                        code: null,
                         error: error.message,
                         authorization: 'LOGGED_OUT'
                     }
@@ -102,6 +105,7 @@ function App(root) {
                 try {
                     let { username, repos } = await retrieveUserData(this.state)
     
+
                     return {
                         username,
                         repos
@@ -159,6 +163,10 @@ function App(root) {
             }
 
             let result = await handleAuthState(this.state)
+            this.state = {
+                ...this.state,
+                ...result
+            }
 
             return this
         },

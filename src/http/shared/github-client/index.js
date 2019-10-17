@@ -8,24 +8,17 @@ module.exports = function GithubClient(client_id, client_secret) {
             code,
             client_secret
         }
+        
         console.log('preparing to send body', body)
-        try {
-            let response = await rp({
-                uri,
-                method: 'POST',
-                headers: { Accept: 'application/json' },
-                body,
-                json: true
-            })
-            console.log(response)
-            return response
-        } catch (error) {
-            /**
-             * { error: 'bad_verification_code',
-             * error_description: 'The code passed is incorrect or expired.' }
-             */
-            return { error }
-        }
+        let response = await rp({
+            uri,
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body,
+            json: true
+        })
+        console.log(response)
+        return response
     }
 
     return { getToken }

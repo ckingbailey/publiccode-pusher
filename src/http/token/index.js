@@ -17,8 +17,15 @@ exports.token = async (req, res) => {
 
         if (response.error) throw response
     } catch (error) {
+        /**
+         * { error: 'bad_verification_code',
+         * error_description: 'The code passed is incorrect or expired.' }
+         */
+        // what kinds of errors might come from GH?
+        // what is error code for "token expired"?
+        let status = +error.status || 500
         console.error('Error:', error)
-        return res.status(500).send({ message: `something went wrong: ${error.error_description}` })
+        return res.status(status).send({ error: error.error_description })
     }
 
     res.json(response)
