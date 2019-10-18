@@ -1,5 +1,4 @@
 export default function Form({ username, repos }) {
-    console.log('Form received data', username, repos)
     let fragment = new DocumentFragment()
 
     let form = document.createElement('form')

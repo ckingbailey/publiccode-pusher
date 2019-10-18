@@ -18,7 +18,6 @@ function App(root) {
     }) {
         switch (authorization) {
             case 'LOGGED_IN':
-                console.log('passing data to Form', username, repos)
                 let components = [ new Form({ username, repos }) ]
                 if (warningSuggestion)
                     components.unshift(
@@ -69,13 +68,10 @@ function App(root) {
 
         // if no token, check for state and code in querystring
         let { state, code } = qs.parse()
-        state && code && console.log(state, code)
         if (state
             && code
             && state === localStorage.getItem('ghStateToken'))
         {
-            console.log(localStorage.getItem('ghStateToken'))
-            console.log('determine auth state is PENDING')
             return {
                 authorization: 'PENDING',
                 stateToken: state,
@@ -89,7 +85,6 @@ function App(root) {
     async function handleAuthState({ authorization, stateToken, code, token }) {
         switch (authorization) {
             case 'PENDING':
-                console.log('case PENDING')
                 try {
                     let result = await (new GithubClient()).get('token', { stateToken, code })
                     let { username, repos } = await retrieveUserData({ token: result.access_token })
@@ -114,7 +109,6 @@ function App(root) {
             case 'LOGGED_IN':
                 try {
                     let { username, repos } = await retrieveUserData({ token })
-                    console.log(username, repos)
 
                     return {
                         username,
@@ -134,7 +128,6 @@ function App(root) {
                     }
                 }
             case 'LOGGED_OUT': {
-                console.log('case LOGGED_OUT')
                 let stateToken = GithubClient.generateState()
                 localStorage.setItem('ghStateToken', stateToken)
 

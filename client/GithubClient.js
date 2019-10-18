@@ -5,14 +5,12 @@ function GithubClient(token) {
         let { url, options } = endpoints(param, data)
         // const TOKEN = localStorage.getItem('ghToken')
         
-        console.log(url, options)
         let response = await fetch(url, options)
         let json = await response.json()
-        console.log(json)
 
         if (response.status !== 200) {
             let statusCode = response.status
-            let { message } = json
+            let { message } = response
             let er = Error(message)
             er.code = statusCode
             throw er
@@ -48,7 +46,7 @@ function GithubClient(token) {
                     url: `https://api.github.com/users/${params.login}/repos`,
                     options: {
                         headers: {
-                            Authorization: `token`
+                            Authorization: `token ${token}`
                         }
                     }
                 }
