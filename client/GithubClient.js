@@ -1,48 +1,24 @@
 function GithubClient(token) {
-    let state
-
     return { get }
 
     async function get(param, data) {
         let { url, options } = endpoints(param, data)
         // const TOKEN = localStorage.getItem('ghToken')
         
-        if (options.Authorization && options.Authorization === 'token')
-            options.Authorization += ` ${token}`
-
         console.log(url, options)
         let response = await fetch(url, options)
+        let json = await response.json()
+        console.log(json)
 
         if (response.status !== 200) {
             let statusCode = response.status
-            let { message } = await response.json()
+            let { message } = json
             let er = Error(message)
             er.code = statusCode
             throw er
         }
         
-        return response
-    }
-
-    async function getToken(code) {
-        let url = 'http://localhost:3000/token'
-        // let url = 'https://us-central1-github-commit-schema.cloudfunctions.net/token'
-        state = state || localStorage.getItem('ghStateToken')
-        let body = `code=${code}&state=${state}`
-        try {
-            let response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                mode: 'cors',
-                body
-            })
-            return await response.json()
-        } catch (error) {
-            throw error
-        }
+        return json
     }
 
     function endpoints(endpoint, params) {
@@ -62,14 +38,18 @@ function GithubClient(token) {
                 return {
                     url: 'https://api.github.com/user',
                     options: {
-                        Authorization: 'token'
+                        headers: {
+                            Authorization: `token ${token}`
+                        }
                     }
                 }
             case 'repos':
                 return {
-                    url: `https://api.github.com/user/${params.login}/repos`,
+                    url: `https://api.github.com/users/${params.login}/repos`,
                     options: {
-                        Authorization: 'token'
+                        headers: {
+                            Authorization: `token`
+                        }
                     }
                 }
             default:
