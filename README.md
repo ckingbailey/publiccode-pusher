@@ -8,3 +8,19 @@ As much as possible, the code should run entirely in the browser, without minima
 1. Code runs in browser with minimal need for backend.
 2. Web form and schema file shall be drop-in. We haven't settled on a schema yet so this will need to remain flexible.
 3. Use Github OAuth flow to authenticate user. Commit schema file as authenticated user.
+
+# Development
+
+# Deployment
+## The frontend** is deployed to GitHub pages
+Run the build step
+```bash
+npm run build
+```
+
+This builds to the `build/` folder. You will then need to push the `build/` folder to the `gh-pages` branch
+```bash
+git worktree add -b build gh-pages
+git add build
+git push -u origin gh-pages
+```

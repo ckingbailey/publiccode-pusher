@@ -1,4 +1,5 @@
 function GithubClient(token) {
+    const TOKEN_SERVER = 'http://localhost:3000/token'
     return { get }
 
     async function get(param, data) {
@@ -23,7 +24,7 @@ function GithubClient(token) {
         switch (endpoint) {
             case 'token':
                 return {
-                    url: 'http://localhost:3000/token',
+                    url: TOKEN_SERVER,
                     options: {
                         method: 'POST',
                         headers: {

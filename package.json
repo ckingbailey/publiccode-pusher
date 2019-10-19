@@ -1,5 +1,5 @@
 {
-  "name": "@github-commit-schema/main",
+  "name": "@brigade-project-index/schema-pusher",
   "version": "1.0.0",
   "description": "development server to run  gcloud functions for brigade-project-index github-commit-schema",
   "main": "index.js",
@@ -8,7 +8,10 @@
     "express": "^4.17.1",
     "nodemon": "^1.19.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-replace": "^1.0.0"
+  },
   "scripts": {
     "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
