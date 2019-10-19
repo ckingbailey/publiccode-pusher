@@ -9,6 +9,7 @@
     "nodemon": "^1.19.3"
   },
   "devDependencies": {
+    "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-replace": "^1.0.0"
   },
