@@ -12,7 +12,7 @@ As much as possible, the code should run entirely in the browser, without minima
 # Development
 
 # Deployment
-## The frontend** is deployed to GitHub pages
+## The frontend is deployed to GitHub pages
 Run the build step
 ```bash
 npm run build
@@ -23,4 +23,16 @@ This builds to the `build/` folder. You will then need to push the `build/` fold
 git worktree add -b build gh-pages
 git add build
 git push -u origin gh-pages
+```
+
+## The backend is deployed on Google Cloud Platform
+The homespun GitHub client needs to be packaged with deployed code. It is listed as a dependency in `package.json` so you can navigate to the `token` folder and do
+```bash
+npm install
+```
+to have npm install it in the `node_modules` of the `token` module
+
+To push the code to GCP do
+```bash
+gcloud functions deploy token
 ```
