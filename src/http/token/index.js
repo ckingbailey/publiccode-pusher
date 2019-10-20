@@ -26,7 +26,7 @@ exports.token = async (req, res) => {
         // what is error code for "token expired"?
         let status = +error.status
         if (!status && error.error === 'bad_verification_code')
-            status = 400
+            status = 400 || 500
         
         if (!error.message)
             error = {
