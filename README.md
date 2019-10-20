@@ -26,13 +26,16 @@ git push -u origin gh-pages
 ```
 
 ## The backend is deployed on Google Cloud Platform
-The homespun GitHub client needs to be packaged with deployed code. It is listed as a dependency in `package.json` so you can navigate to the `token` folder and do
-```bash
-npm install
-```
-to have npm install it in the `node_modules` of the `token` module
+You'll need to install and configure the Google Cloud SDK. Check it out and get all the [hottest tips here](https://cloud.google.com/sdk/docs/)
 
-To push the code to GCP do
+Once you've got the thing installed, to push the code to GCP do
 ```bash
-gcloud functions deploy token
+gcloud functions deploy token --source='src/http/token'
 ```
+
+But actually I have courteously aliased that command for you to
+```bash
+npm run deploy
+```
+
+Yer gonna have to set the environment variables GH_CLIENT_ID and GH_CLIENT_SECRET to make it work.
