@@ -9,13 +9,17 @@
     "nodemon": "^1.19.3"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "del": "^5.1.0",
     "gulp": "^4.0.2",
-    "gulp-replace": "^1.0.0"
+    "gulp-replace": "^1.0.0",
+    "mocha": "^6.2.2",
+    "proxyquire": "^2.1.3",
+    "sinon": "^7.5.0"
   },
   "scripts": {
     "start": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "deploy": "gcloud functions deploy token --source='src/http/token'"
   },
   "keywords": [],

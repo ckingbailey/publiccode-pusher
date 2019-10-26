@@ -10,6 +10,23 @@ As much as possible, the code should run entirely in the browser, without minima
 3. Use Github OAuth flow to authenticate user. Commit schema file as authenticated user.
 
 # Development
+First, install the dependencies
+```bash
+npm install
+```
+
+There's a development server to stand in for the Cloud Functions runtime. It's entire purpose in life is to receive the code that the frontend gets from GitHub and exchange it for an `access_token`. We need it because we must keep the GitHub `client_secret` private. To run the server with nodemon
+```bash
+npm start
+```
+
+The above development server does not serve the frontend. You'll need a separate HTTP server for that. I use [serve](), installed globally, but you can use whatever you like.
+```bash
+serve client
+```
+
+# Testing
+Tests use [Mocha](), [Sinon](), and [Chai]().
 
 # Deployment
 ## The frontend is deployed to GitHub pages
