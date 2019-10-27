@@ -20,6 +20,7 @@
   },
   "scripts": {
     "start": "nodemon",
+    "clean": "gulp clean",
     "build": "gulp",
     "test": "mocha",
     "deploy": "gcloud functions deploy token --source='src/http/token'"

@@ -3,7 +3,7 @@ let del = require('del')
 let { src, dest, series } = require('gulp')
 
 function clean() {
-    return del('build')
+    del([ 'build/{,.}*[!.,!.git]' ])
 }
 
 function build() {

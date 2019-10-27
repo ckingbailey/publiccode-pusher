@@ -37,13 +37,17 @@ npm run build
 
 This builds to the `build/` folder. You will then need to push the `build/` folder to the `gh-pages` branch
 ```bash
-git worktree add -b build gh-pages
-git add build
+git worktree add --detach build
+npm run build
+cd build
+git checkout -b gh-pages
+git add .
+git commit -m 'message for build commit'
 git push -u origin gh-pages
 ```
 
 ## The backend is deployed on Google Cloud Platform
-You'll need to install and configure the Google Cloud SDK. Check it out and get all the [hottest tips here](https://cloud.google.com/sdk/docs/)
+You'll need to install and configure the Google Cloud SDK. Check it out and get [all the hottest tips here](https://cloud.google.com/sdk/docs/)
 
 Once you've got the thing installed, to push the code to GCP do
 ```bash
