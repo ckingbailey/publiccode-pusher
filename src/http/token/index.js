@@ -1,6 +1,10 @@
 let ghClient = require('./github-client')
 
 exports.token = async (req, res) => {
+    let allowedOrigin = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:5000'
+        : 'https://ckingbailey.github.io'
+    res.set('Access-Control-Allow-Origin', allowedOrigin)
     console.log(req.body)
     if (req.method !== 'POST')
         return res.status(405).json({ message: 'nop' })
