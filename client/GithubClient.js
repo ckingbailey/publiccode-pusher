@@ -26,6 +26,7 @@ function GithubClient(token) {
                 return {
                     url: TOKEN_SERVER,
                     options: {
+                        mode: 'no-cors',
                         method: 'POST',
                         headers: {
                             'content-type': 'application/x-www-form-urlencoded'
