@@ -1,9 +1,10 @@
-import Login from './components/Login.js'
-import Form from './components/Form.js'
 import Banner from './components/Banner.js'
-import Loading from './components/Loading.js'
+import Form from './components/Form.js'
 import GithubClient from './GithubClient.js'
+import Loading from './components/Loading.js'
+import Login from './components/Login.js'
 import qs from './querystring.js'
+import RepoPicker from './components/RepoPicker.js'
 
 function App(root) {
     const client_id = '8390933a81635970d3b6'
@@ -18,7 +19,12 @@ function App(root) {
     }) {
         switch (authorization) {
             case 'LOGGED_IN':
-                let components = [ new Form({ username, repos }) ]
+                let components = [
+                    new RepoPicker(repos, {
+                        id: 'repo-picker'
+                    }),
+                    new Form({ username })
+                ]
                 if (warningSuggestion)
                     components.unshift(
                         new Banner({

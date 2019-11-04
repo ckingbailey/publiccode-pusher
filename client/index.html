@@ -10,5 +10,18 @@
         <div id="main">
         </div>
         <script type="module" src="index.js"></script>
+        <script>
+            class SelectTrigger extends HTMLSelectElement {
+                constructor() {
+                    super()
+
+                    this.addEventListener('change', ev => {
+                        console.log(ev.target)
+                    })
+                }
+            }
+
+            customElements.define('select-trigger', SelectTrigger, { extends: 'select' })
+        </script>
     </body>
 </html>

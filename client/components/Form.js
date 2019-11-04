@@ -5,8 +5,6 @@ export default function Form({ username, repos }) {
     form.id = 'schema-form'
     fragment.appendChild(form)
 
-    form.appendChild(document.createElement('input'))
-
     if (username) {
         let user = document.createElement('h1')
         user.innerText = username
