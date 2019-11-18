@@ -129,25 +129,20 @@ class Index extends Component {
     if (country) this.switchCountry(country);
   }
 
-  // eslint-disable-next-line no-unused-vars
-  generate(formValues) {
+  generate() {
     let lastGen = moment();
     this.setState({ loading: true, lastGen });
-    //has state
     let { values, country, elements } = this.state;
-    //values[currentLanguage] = formValues;
     let obj = ft.transform(values, country, elements);
 
-    // let errors = await fv.validatePubliccodeYml(obj);
-    // if (errors) alert(errors);
-
-    //SET  TIMESTAMP
+    // fork, if necessary
+    // create new branch
+    // commit yml file to new branch
+    // open PR for branch
     this.showResults(obj);
-    //this.showResults(obj);
   }
 
   showResults(values) {
-    //has state
     try {
       let mergedValue = Object.assign(staticFieldsJson, values);
       let tmpYaml = jsyaml.dump(mergedValue);
