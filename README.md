@@ -3,7 +3,7 @@ The intention of this project is to provide Code for America brigade project lea
 We have settled on [publiccode.yml](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html) for our schema format.
 
 # Scope
-As much as possible, the code should run entirely in the browser, with minimal need for a backend. The scripts shall target Github, and no other git hosting site. There shall be a web form to serve as a demo of the product. The plan for now is to deploy to Github pages with a handler for the auth token on Google Cloud Functions.
+As much as possible, the code should run entirely in the browser, with minimal need for a backend. The form targets Github, and no other Git hosting site. The plan for now is to deploy to Github pages with a handler for the auth token on Google Cloud Functions.
 
 # Goals
 1. Code runs in browser with minimal need for backend.
@@ -20,16 +20,35 @@ There's a development server to stand in for the Cloud Functions runtime. It's e
 npm start
 ```
 
-The above development server does not serve the frontend. You'll need a separate HTTP server for that. I use [serve](https://github.com/zeit/serve#readme), installed globally, but you can use whatever you like.
+The above development server does not serve the frontend.
+
+## The frontend is now a React app
+
+I [appropriated it from the Italians](https://github.com/italia/publiccode-editor), who invented publiccode.yml
+
+If you've worked with React before, you probably know the drill. Navigate into the client/ folder and do
 ```bash
-serve client
+npm i
 ```
 
+Then to run the development server, do
+```bash
+npm run dev
+```
+
+The app is served at localhost:3000.
+
 # Testing
+
+⚠️ I honestly don't know what the state of the tests is since I switched a React app. I guess I should try running them.
+
 Tests use [Mocha](https://mochajs.org/), [Sinon](https://sinonjs.org), [proxyquire](https://github.com/thlorenz/proxyquire) and [Chai](https://www.chaijs.com).
 
 # Deployment
 ## The frontend is deployed to GitHub pages
+
+⚠️ This probably changed a lot since I switched to a React app for the frontend. I still gotta figure out what the new deploy flow is.
+
 Run the build step
 ```bash
 npm run build
