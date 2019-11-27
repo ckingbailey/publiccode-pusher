@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
+import { authorize, setStateToken, setGHCode } from '../store/auth'
 import { APP_FORM } from "../contents/constants";
 import {
   getData,
@@ -26,21 +27,29 @@ import * as fv from "../utils/validate";
 
 import {staticFieldsJson, staticFieldsYaml} from "../contents/staticFields";
 
+import GithubClient from '../utils/GithubClient'
+
 const mapStateToProps = state => {
   return {
     notifications: state.notifications,
     cache: state.cache,
     form: state.form,
-    yamlLoaded: state.yamlLoaded
+    yamlLoaded: state.yamlLoaded,
+    ghAuthToken: state.ghAuthToken,
+    ghStateToken: state.ghStateToken,
+    ghCode: state.ghCode
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     initialize: (name, data) => dispatch(initialize(name, data)),
+    setStateToken: (stateToken) => dispatch(setStateToken(stateToken)),
+    setGHCode: (code) => dispatch(setGHCode(code)),
+    authorize: (token) => dispatch(authorize(token)),
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
-    setVersions: data => dispatch(setVersions(data))
+    setVersions: data => dispatch(setVersions(data)),
   };
 };
 
@@ -85,7 +94,7 @@ class Index extends Component {
 
   async initData(country = null) {
     //has state
-    console.log("initData");
+    // console.log("initData");
     let { elements, blocks, allFields } = await getData(country);
     this.setState({ elements, blocks, country, allFields });
     this.initBootstrap();
@@ -115,7 +124,7 @@ class Index extends Component {
     // if (currentLanguage) currentValues = values[currentLanguage];
 
     //UPDATE STATE
-    console.log('update state');
+    // console.log('update state');
     this.setState({
       yaml,
       languages,
@@ -170,7 +179,7 @@ class Index extends Component {
     }
 
 
-      this.props.notify({ type, title, msg, millis });
+    this.props.notify({ type, title, msg, millis });
     //this.scrollToError(errors)
     this.setState({ yaml, yamlLoaded });
   }
