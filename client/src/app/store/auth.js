@@ -3,13 +3,15 @@ import { createAction, handleActions } from "redux-actions"
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_STATE_TOKEN = 'SET_STATE_TOKEN'
 export const SET_GH_CODE = 'SET_GH_CODE'
+export const LOGOUT = 'LOGOUT'
 
 export const authorize = createAction(SET_AUTH_TOKEN)
 export const setStateToken = createAction(SET_STATE_TOKEN)
 export const setGHCode = createAction(SET_GH_CODE)
+export const logout = createAction(LOGOUT)
 
 const initialState = {
-    ghAuthToken: null,
+    ghAuthToken: 1,
     ghStateToken: null,
     ghCode: null
 }
@@ -33,7 +35,8 @@ const reducer = handleActions(
                 ...state,
                 ghCode: action.payload
             }
-        }
+        },
+        LOGOUT: () => initialState
     },
     initialState
 )

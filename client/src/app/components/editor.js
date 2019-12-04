@@ -3,12 +3,9 @@ import { connect } from "react-redux";
 import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
-import { authorize, setStateToken, setGHCode } from '../store/auth'
+import { authorize, setStateToken, setGHCode, logout } from '../store/auth'
 import { APP_FORM } from "../contents/constants";
-import {
-  getData,
-  SUMMARY
-} from "../contents/data";
+import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
 
 import _ from "lodash";
@@ -35,9 +32,7 @@ const mapStateToProps = state => {
     cache: state.cache,
     form: state.form,
     yamlLoaded: state.yamlLoaded,
-    ghAuthToken: state.ghAuthToken,
-    ghStateToken: state.ghStateToken,
-    ghCode: state.ghCode
+    auth: state.auth
   };
 };
 
@@ -47,6 +42,7 @@ const mapDispatchToProps = dispatch => {
     setStateToken: (stateToken) => dispatch(setStateToken(stateToken)),
     setGHCode: (code) => dispatch(setGHCode(code)),
     authorize: (token) => dispatch(authorize(token)),
+    logout: () => dispatch(logout()),
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
@@ -61,6 +57,7 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      ghClientId: '8390933a81635970d3b6',
       search: null,
       yaml: null,
       loading: false,
@@ -368,7 +365,23 @@ class Index extends Component {
     this.setState({ activeSection: activeSection });
   }
 
-  render() {
+  prepareAuthFlow() {
+    let ghStateToken = GithubClient.generateState()
+    this.props.setStateToken(ghStateToken)
+    localStorage.setItem('ghState', ghStateToken)
+  }
+
+  async exchangeCodeForAuthToken(code) {
+    let gh = new GithubClient()
+    let token = await gh.get('token', {
+      code,
+      stateToken: this.props.ghStateToken
+    })
+    this.props.authorize(token)
+    localStorage.setItem('ghToken', token)
+  }
+
+  renderForm() {
     let {
       currentLanguage,
       blocks,
@@ -415,6 +428,14 @@ class Index extends Component {
         </div>
         {this.renderSidebar()}
       </Fragment>
+    )
+  }
+
+  render() {
+    return (
+        this.props.auth.ghAuthToken
+        ? this.renderForm()
+        : <button type="button">Login to Github</button>
     );
   }
 }
