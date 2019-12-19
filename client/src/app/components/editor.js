@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
-import { authorize, setStateToken, setGHCode, logout } from '../store/auth'
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
@@ -31,18 +30,13 @@ const mapStateToProps = state => {
     notifications: state.notifications,
     cache: state.cache,
     form: state.form,
-    yamlLoaded: state.yamlLoaded,
-    auth: state.auth
+    yamlLoaded: state.yamlLoaded
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     initialize: (name, data) => dispatch(initialize(name, data)),
-    setStateToken: (stateToken) => dispatch(setStateToken(stateToken)),
-    setGHCode: (code) => dispatch(setGHCode(code)),
-    authorize: (token) => dispatch(authorize(token)),
-    logout: () => dispatch(logout()),
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
@@ -53,7 +47,7 @@ const mapDispatchToProps = dispatch => {
   mapStateToProps,
   mapDispatchToProps
 )
-class Index extends Component {
+class Editor extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -381,7 +375,7 @@ class Index extends Component {
     localStorage.setItem('ghToken', token)
   }
 
-  renderForm() {
+  render() {
     let {
       currentLanguage,
       blocks,
@@ -392,7 +386,6 @@ class Index extends Component {
     } = this.state;
 
     let errors = null;
-    // let submitFailed = false;
     let { form } = this.props;
 
     if (form && form[APP_FORM]) {
@@ -421,7 +414,7 @@ class Index extends Component {
                   errors={errors}
                   allFields={allFields}
                 />
-              )}
+            )}
           </div>
           {currentLanguage && this.renderFoot()}
           <InfoBox />
@@ -430,14 +423,6 @@ class Index extends Component {
       </Fragment>
     )
   }
-
-  render() {
-    return (
-        this.props.auth.ghAuthToken
-        ? this.renderForm()
-        : <button type="button">Login to Github</button>
-    );
-  }
 }
 
-export default Index;
+export default Editor;

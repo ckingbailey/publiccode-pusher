@@ -11,7 +11,7 @@ export const setGHCode = createAction(SET_GH_CODE)
 export const logout = createAction(LOGOUT)
 
 const initialState = {
-    ghAuthToken: 1,
+    ghAuthToken: null,
     ghStateToken: null,
     ghCode: null
 }
