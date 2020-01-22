@@ -14,7 +14,7 @@ const reducer = combineReducers({
 })
 
 const store = (window.devToolsExtension
-  ? window.devToolsExtension()(createStore)
+  ? window.devToolsExtension()(createStore) // This is depcrated. Update to __REDUX_DEVTOOLS_EXTENSION__
   : createStore)(reducer);
 
 export default store
