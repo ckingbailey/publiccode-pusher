@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import { connect } from "react-redux";
 
 import store from "./store/index";
-import { authorize, logout } from "./store/auth"
 import { Provider } from "react-redux";
 
 import Layout from "./components/_layout";

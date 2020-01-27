@@ -23,8 +23,6 @@ import * as fv from "../utils/validate";
 
 import {staticFieldsJson, staticFieldsYaml} from "../contents/staticFields";
 
-import GithubClient from '../utils/GithubClient'
-
 const mapStateToProps = state => {
   return {
     notifications: state.notifications,
@@ -51,7 +49,6 @@ class Editor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ghClientId: '8390933a81635970d3b6',
       search: null,
       yaml: null,
       loading: false,
@@ -357,22 +354,6 @@ class Editor extends Component {
       console.warn("inviewport");
     }
     this.setState({ activeSection: activeSection });
-  }
-
-  prepareAuthFlow() {
-    let ghStateToken = GithubClient.generateState()
-    this.props.setStateToken(ghStateToken)
-    localStorage.setItem('ghState', ghStateToken)
-  }
-
-  async exchangeCodeForAuthToken(code) {
-    let gh = new GithubClient()
-    let token = await gh.get('token', {
-      code,
-      stateToken: this.props.ghStateToken
-    })
-    this.props.authorize(token)
-    localStorage.setItem('ghToken', token)
   }
 
   render() {

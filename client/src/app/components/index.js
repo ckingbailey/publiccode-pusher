@@ -1,42 +1,24 @@
-import React, { Component, Fragment } from "react"
-import { connect } from "react-redux"
-import { authorize } from '../store/auth'
+import React, { Component } from "react"
+import { connect } from "react-redux";
 
 import Editor from './editor'
 import Login from './Login'
-// import Login from './login'
 
-const mapStateToProps = state => {
-    return { auth: state.auth }
-};
+const mapStateToProps = state => ({
+    ghAuthToken: state.auth.ghAuthToken
+})
 
-const mapDispatchToProps = dispatch => {
-    return {
-        authorize: token => dispatch(authorize(token)),
-    };
-};
-
-@connect(
-    mapStateToProps,
-    mapDispatchToProps
+@connect (
+    mapStateToProps
 )
-export default class Index extends Component {
-    // get auth state from this.props.authorize()
-    checkAuthState() {
-        // check state
-        // if not in state, check localStorage
-    }
-
-    conditionallyRenderEditorOrLogin() {
-        if (this.props.auth.ghStateToken) {
-            return <Editor />
-        } else return <Login />
-    }
-
+class Index extends Component {
     render() {
-        // conditionally render Editor or Login
         return (
-            this.conditionallyRenderEditorOrLogin()
+            this.props.ghAuthToken
+            ? <Editor/>
+            : <Login/>
         )
     }
 }
+
+export default Index
