@@ -1,5 +1,4 @@
 import { createAction, handleActions } from "redux-actions"
-import GithubClient from '../utils/GithubClient'
 
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_STATE_TOKEN = 'SET_STATE_TOKEN'
@@ -15,22 +14,37 @@ export const logout = createAction(LOGOUT)
 export function exchangeStateAndCodeForToken(stateToken, code) {
     console.log(`exchangeStateAndCode invoked with ${stateToken}, ${code}`)
     // fetch ghAuthToken from endpoint appropriate to environment
-    let gh = new GithubClient()
 
     return function(dispatch) {
-        console.log('dispatch getAuthToken()')
+        const TOKEN_SERVER = 'http://localhost:5000/token'
+
         dispatch(getAuthToken())
 
         console.log('fetch token')
-        gh.get('token', {
-            code,
-            stateToken
-        }).then(token => {
-            console.log(`done fetched token ${token}`)
-            window.localStorage.setItem('ghAuthToken', token)
-            dispatch(setAuthToken(token))
+        fetch(TOKEN_SERVER, {
+            mode: 'cors',
+            method: 'POST',
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+            body: `code=${code}&state=${stateToken}`
+        }).then(res => {
+            console.log('received response from GH client', res)
+            if (!res.ok) {
+                let er = new Error(`${res.status} ${res.statusText}`)
+                er.code = res.status
+                throw er
+            }
+            return res.json()
+        }).then(({ access_token }) => {
+            console.log(`done fetched token ${access_token}`)
+            if (access_token) {
+                dispatch(setAuthToken(access_token))
+                // TODO: it would be useful if this localStorage operation did not happen here in the action creator
+                window.localStorage.setItem('GH_AUTH_TOKEN', access_token)
+                window.localStorage.removeItem('GH_STATE_TOKEN')
+            } else {
+                throw new Error('No access token on response')
+            }
         }).catch(er => {
-            console.error(er)
             dispatch(setAuthToken(er))
         })
     }
@@ -46,7 +60,6 @@ const initialState = {
 
 const reducer = handleActions({
     [ getAuthToken ]: (state) => {
-        console.log('invoked getAuthToken reducer')
         return ({
         ...state,
         isFetching: true,
@@ -59,7 +72,7 @@ const reducer = handleActions({
             ...state,
             ghAuthToken: null,
             isFetching: false,
-            error: action.payload
+            error: 'fetch error'
         }
         : {
             ...state,

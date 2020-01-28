@@ -21,7 +21,7 @@ module.exports = function GithubClient(client_id, client_secret) {
             body,
             json: true
         })
-        console.log(response)
+        console.log('got response', response)
         return response
     }
 

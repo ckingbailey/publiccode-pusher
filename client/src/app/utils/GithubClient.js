@@ -2,25 +2,14 @@ function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
     return { get }
 
-    async function get(param, data) {
-        let { url, options } = endpoints(param, data)
-        
-        let response = await fetch(url, options)
-        console.log('GH got response', response)
-        let json = await response.json()
-        console.log('parsed response body', json)
-
-        if (response.status !== 200) {
-            let { message } = response
-            let er = Error(message)
-            er.code = response.status
-            throw er
-        }
-        
-        return json
+    function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
+        let { url, options } = getRequestParamsForEndpoint(endpoint, data)
+        let res = fetch(url, options)
+        console.log('GH client got response', res)
+        return res
     }
 
-    function endpoints(endpoint, params) {
+    function getRequestParamsForEndpoint(endpoint, params) {
         switch (endpoint) {
             case 'token':
                 return {
