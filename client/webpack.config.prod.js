@@ -3,7 +3,6 @@ const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const devMode = process.env.NODE_ENV !== 'production'
-const autoprefixer = require("autoprefixer");
 const webpack = require("webpack");
 const paths = {
   DIST: path.resolve(__dirname, "dist"),
@@ -11,9 +10,9 @@ const paths = {
   JS: path.resolve(__dirname, "src/app")
 };
 
-module.exports = env => {
+module.exports = () => {
   let stage = "production";
-  let env_file = "./.env";
+  let env_file = "./.env.prod";
 
   if (fs.existsSync(env_file)) {
     require("dotenv").config({ path: env_file });
@@ -29,7 +28,8 @@ module.exports = env => {
       new webpack.DefinePlugin({
         "process.env": {
           REPOSITORY: JSON.stringify(process.env.REPOSITORY),
-          ELASTIC_URL: JSON.stringify(process.env.ELASTIC_URL)
+          ELASTIC_URL: JSON.stringify(process.env.ELASTIC_URL),
+          TOKEN_SERVER: process.env.TOKEN_SERVER
         }
       }),
       new HtmlWebpackPlugin({

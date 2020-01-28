@@ -12,7 +12,7 @@ const paths = {
 
 module.exports = () => {
   let stage = "development";
-  let env_file = "./.env";
+  let env_file = './.env.dev';
 
 
   if (fs.existsSync(env_file)) {
@@ -29,7 +29,8 @@ module.exports = () => {
       new webpack.DefinePlugin({
         "process.env": {
           REPOSITORY: JSON.stringify(process.env.REPOSITORY),
-          ELASTIC_URL: JSON.stringify(process.env.ELASTIC_URL)
+          ELASTIC_URL: JSON.stringify(process.env.ELASTIC_URL),
+          TOKEN_SERVER: JSON.stringify(process.env.TOKEN_SERVER)
         }
       }),
       new HtmlWebpackPlugin({
@@ -41,11 +42,11 @@ module.exports = () => {
           removeComments: true,
           useShortDoctype: true
         },
-	favicon: './src/asset/img/favicon-32x32.png'
+        favicon: './src/asset/img/favicon-32x32.png'
       }),
       new MiniCssExtractPlugin({
         filename: devMode ? '[name].css' : '[name].[hash].css',
-        chunkFilename: devMode ? '[id].css': '[id].[hash].css',
+        chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
       })
     ],
     module: {
@@ -62,13 +63,13 @@ module.exports = () => {
         },
 
         {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
-        ],
+          test: /\.(sa|sc|c)ss$/,
+          use: [
+            devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+            'css-loader',
+            'postcss-loader',
+            'sass-loader',
+          ],
         },
 
         {
@@ -88,6 +89,9 @@ module.exports = () => {
         'cldr$': 'cldrjs',
         'cldr': 'cldrjs/dist/cldr'
       }
+    },
+    devServer: {
+      liveReload: false
     }
   };
 };

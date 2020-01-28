@@ -14,17 +14,18 @@ export const logout = createAction(LOGOUT)
 export function exchangeStateAndCodeForToken(stateToken, code) {
     // fetch ghAuthToken from endpoint appropriate to environment
     return function(dispatch) {
-        const TOKEN_SERVER = 'http://localhost:5000/token'
+        const { TOKEN_SERVER } = process.env
 
         dispatch(getAuthToken())
 
-        fetch(TOKEN_SERVER, {
+        fetch(`${TOKEN_SERVER}/token`, {
             mode: 'cors',
             method: 'POST',
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
             body: `code=${code}&state=${stateToken}`
         }).then(res => {
             if (!res.ok) {
+                // TODO: get at response body here, and add it to Error on a prop that will not be dropped by createAction
                 let er = new Error(`${res.status} ${res.statusText}`)
                 er.code = res.status
                 throw er
