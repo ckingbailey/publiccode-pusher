@@ -13,7 +13,6 @@ module.exports = function GithubClient(client_id, client_secret) {
             client_secret
         }
         
-        console.log('preparing to send body', body)
         let response = await rp({
             uri,
             method: 'POST',
@@ -21,7 +20,6 @@ module.exports = function GithubClient(client_id, client_secret) {
             body,
             json: true
         })
-        console.log('got response', response)
         return response
     }
 

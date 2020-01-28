@@ -5,7 +5,6 @@ function GithubClient(token) {
     function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
         let { url, options } = getRequestParamsForEndpoint(endpoint, data)
         let res = fetch(url, options)
-        console.log('GH client got response', res)
         return res
     }
 

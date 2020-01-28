@@ -5,7 +5,6 @@ exports.token = async (req, res) => {
         ? 'http://localhost:3000'
         : 'https://ckingbailey.github.io'
     res.set('Access-Control-Allow-Origin', allowedOrigin)
-    console.log(req.body)
     if (req.method !== 'POST')
         return res.status(405).json({ message: 'nop' })
 
@@ -17,7 +16,6 @@ exports.token = async (req, res) => {
     let response
     try {
         response = await gh.getToken(req.body.code)
-        console.log('token returned from gh-client', response.access_token)
 
         if (response.error) throw response
     } catch (error) {

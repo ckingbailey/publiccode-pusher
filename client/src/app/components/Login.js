@@ -58,42 +58,30 @@ class Login extends Component {
      *      - generate Gh state token, hold it in state & save it in localStorage
      */
     componentDidMount() {
-        console.log('Login done mounted')
         // if ghAuthToken is on localStorage and not Redux, this must be first load
         let storedToken = window.localStorage.getItem('GH_AUTH_TOKEN')
-        console.log(`is storedToken truthy? ${Boolean(storedToken)}`)
         if (storedToken || this.props.ghAuthToken !== null) {
-            console.log(`is token on localStorage? ${storedToken}`)
-            console.log(`is token on store.state? ${this.props.ghAuthToken}`)
             if (storedToken && this.props.ghAuthToken === null) {
-                console.log('stored token but no token on store. Call setAuthToken')
                 this.props.setAuthToken(window.localStorage.getItem('GH_AUTH_TOKEN'))
             }
             // if ghAuthToken is on Redux but not on localStorage, we gotta store it on localStorage
             else if (!storedToken && this.props.ghAuthToken !== null) {
-                console.log(`token not stored ${storedToken}, but on redux store ${this.props.ghAuthToken}. Store it`)
                 this.storeTokenLocally('GH_AUTH_TOKEN', this.props.ghAuthToken)
             }
             return
         }
-        console.log('No auth token found')
 
         // if no ghAuthToken found anywhere, check for gh state token & code
         let { code, stateToken } = this.getCodeAndStateFromQs(window.location.search)
-        console.log(`got state and code from qs ${code}, ${stateToken}`)
         let storedStateToken = window.localStorage.getItem('GH_STATE_TOKEN')
-        console.log(`got locally stored state token ${storedStateToken}`)
         // if we have code & state tokens match in qs & localStorage
         // use them to fetch ghAuthToken
-        console.log(`stored state token equals received state token: ${stateToken && storedStateToken && stateToken === storedStateToken}`)
         if (code && stateToken && storedStateToken && stateToken === storedStateToken) {
-            console.log('Found state token and code. Call exchangeStateAndCode')
             this.props.exchangeStateAndCodeForToken(stateToken, code)
         } else {
             const ghStateToken = Gh.generateState()
             localStorage.setItem('GH_STATE_TOKEN', ghStateToken)
             this.setState({ ghStateToken })
-            console.log(`generated and stored new state token: ${ghStateToken}`)
         }
     }
 

@@ -12,22 +12,18 @@ export const setGHCode = createAction(SET_GH_CODE)
 export const logout = createAction(LOGOUT)
 
 export function exchangeStateAndCodeForToken(stateToken, code) {
-    console.log(`exchangeStateAndCode invoked with ${stateToken}, ${code}`)
     // fetch ghAuthToken from endpoint appropriate to environment
-
     return function(dispatch) {
         const TOKEN_SERVER = 'http://localhost:5000/token'
 
         dispatch(getAuthToken())
 
-        console.log('fetch token')
         fetch(TOKEN_SERVER, {
             mode: 'cors',
             method: 'POST',
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
             body: `code=${code}&state=${stateToken}`
         }).then(res => {
-            console.log('received response from GH client', res)
             if (!res.ok) {
                 let er = new Error(`${res.status} ${res.statusText}`)
                 er.code = res.status
@@ -35,7 +31,6 @@ export function exchangeStateAndCodeForToken(stateToken, code) {
             }
             return res.json()
         }).then(({ access_token }) => {
-            console.log(`done fetched token ${access_token}`)
             if (access_token) {
                 dispatch(setAuthToken(access_token))
                 // TODO: it would be useful if this localStorage operation did not happen here in the action creator
@@ -65,7 +60,6 @@ const reducer = handleActions({
         isFetching: true,
     })},
     [ setAuthToken ]: (state, action) => {
-        console.log(`invoked setAuthToken reducer with ${JSON.stringify(action)}`)
         return (
         action.error
         ? {
