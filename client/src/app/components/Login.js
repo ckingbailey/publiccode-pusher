@@ -6,7 +6,9 @@ import { setStateToken, setAuthToken, exchangeStateAndCodeForToken } from '../st
 import Gh from '../utils/GithubClient'
 
 let mapStateToProps = state => ({
-    ghAuthToken: state.auth.ghAuthToken
+    ghAuthToken: state.auth.ghAuthToken,
+    fetchingToken: state.auth.isFetching,
+    authError: state.auth.error
 })
 
 let mapDispatchToProps = dispatch => ({

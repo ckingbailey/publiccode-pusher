@@ -29,7 +29,7 @@ module.exports = () => {
         "process.env": {
           REPOSITORY: JSON.stringify(process.env.REPOSITORY),
           ELASTIC_URL: JSON.stringify(process.env.ELASTIC_URL),
-          TOKEN_SERVER: process.env.TOKEN_SERVER
+          TOKEN_SERVER: JSON.stringify(process.env.TOKEN_SERVER)
         }
       }),
       new HtmlWebpackPlugin({
