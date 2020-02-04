@@ -46,7 +46,6 @@ class Login extends Component {
     storeTokenLocally(key, token) {
         if (token) {
             localStorage.setItem(key, token)
-            console.log(`done stored token ${token}`)
         }
     }
 

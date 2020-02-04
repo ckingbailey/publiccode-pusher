@@ -29,10 +29,7 @@ export function exchangeStateAndCodeForToken(stateToken, code) {
                 ? 'json'
                 : 'text'
                 // TODO: get at response body here, and add it to Error on a prop that will not be dropped by createAction
-                console.log('content-type header is', res.headers.get('content-type'))
-                console.log('gonna convert with body', bodyMethod)
                 return res[bodyMethod]().then(body => {
-                    console.log('converted body', body)
                     let errorMsg = body.message || `${res.status} ${res.statusText}`
                     throw new Error(errorMsg)
                 }).catch(er => {
@@ -72,7 +69,6 @@ const reducer = handleActions({
         isFetching: true,
     })},
     [ setAuthToken ]: (state, action) => {
-        console.log('dispatched setAuthToken with', action)
         return (
         action.error
         ? {
