@@ -14,7 +14,9 @@ export const logout = createAction(LOGOUT)
 export function exchangeStateAndCodeForToken(stateToken, code) {
     // fetch ghAuthToken from endpoint appropriate to environment
     return function(dispatch) {
-        const { TOKEN_SERVER } = process.env
+        const TOKEN_SERVER = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:5000'
+        : 'https://us-central1-github-commit-schema.cloudfunctions.net'
 
         dispatch(getAuthToken())
 
@@ -47,7 +49,6 @@ export function exchangeStateAndCodeForToken(stateToken, code) {
                 throw new Error('No access token on response')
             }
         }).catch(er => {
-            console.error('catched it in the catch block')
             console.error(er)
             dispatch(setAuthToken(er))
         })
