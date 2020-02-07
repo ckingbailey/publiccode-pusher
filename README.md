@@ -8,6 +8,8 @@ As much as possible, the code should run entirely in the browser, with minimal n
 We have adopted and adapted the official [publiccode-editor](https://github.com/italia/publiccode-editor). It's a React + Redux app, which makes the development setup of this project rather more complex, but hopefully the switch will pay off in saving us work that has already been done by the creator's of publiccode-editor.
 
 # Development
+**NOTE:** to make sure the servers get the right config, environment variable NODE_ENV=development
+
 First, install the dependencies
 ```bash
 npm install
