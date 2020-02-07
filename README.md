@@ -20,7 +20,7 @@ There's a development server to stand in for the Cloud Functions runtime. It's e
 GH_CLIENT_ID
 GH_CLIENT_SECRET
 ```
-You can access someone else on the project for these, or set up your own for your own app.
+Reach out to someone else on the project for these, or set up your own for your own app.
 
 To run the server locally with nodemon
 ```bash
