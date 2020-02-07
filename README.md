@@ -13,18 +13,25 @@ First, install the dependencies
 npm install
 ```
 
-There's a development server to stand in for the Cloud Functions runtime. It's entire purpose in life is to receive the `code` that the frontend gets from GitHub and exchange it for an `access_token`. We need a server-side function because we must keep the GitHub `client_secret` private. To run the server locally with nodemon
+There's a development server to stand in for the Cloud Functions runtime. It's entire purpose in life is to receive the `code` that the frontend gets from GitHub and exchange it for an `access_token`. We need a server-side function because we must keep the GitHub `client_secret` private. The token server will look for a couple of environment variables
+```
+GH_CLIENT_ID
+GH_CLIENT_SECRET
+```
+You can access someone else on the project for these, or set up your own for your own app.
+
+To run the server locally with nodemon
 ```bash
 npm start
 ```
 
-The backend API is served at localhost:5000
+The backend is served at localhost:5000
 
 The above development server does not serve the frontend.
 
 ## The frontend is now a React app
 
-I [appropriated it from Italia](https://github.com/italia/publiccode-editor), who invented publiccode.yml
+I [appropriated it from Italia](https://github.com/italia/publiccode-editor), who maintain publiccode.yml
 
 If you've worked with React before, you probably know the drill. Navigate into the client/ folder and do
 ```bash
@@ -36,32 +43,32 @@ Then to run the development server, do
 npm start
 ```
 
-The app is served at localhost:3000.
+The frontend app is served at localhost:3000.
 
 # Testing
 
 ⚠️ I honestly don't know what the state of the tests is since I switched to the React app. I guess I should try running them.
 
-Tests use [Mocha](https://mochajs.org/), [Sinon](https://sinonjs.org), [proxyquire](https://github.com/thlorenz/proxyquire) and [Chai](https://www.chaijs.com).
+The tests on the backend use [Mocha](https://mochajs.org/), [Sinon](https://sinonjs.org), [proxyquire](https://github.com/thlorenz/proxyquire) and [Chai](https://www.chaijs.com). I haven't run them since I switched the frontend, but they should all still work as not much changed on token server. I suppose I should try running them, too.
 
 # Deployment
 ## The frontend is deployed to GitHub pages
 
-⚠️ This probably changed a lot since I switched to a React app for the frontend. I still gotta figure out what the new deploy flow is.
+⚠️ This probably changed a lot since I switched to a React app for the frontend. I've only begun to figure that out and update this README.
 
 Run the build step
 ```bash
-npm run build
+npm run build-prod
 ```
 
-This builds to the `build/` folder. You will then need to push the `build/` folder to the `gh-pages` branch
+This builds to the `dist/` folder. You will then need to push the `dist/` folder to the `gh-pages` branch
 ```bash
 git worktree add --detach build
-npm run build
-cd build
+npm run build-prod
+cd dist
 git checkout -b gh-pages
 git add .
-git commit -m 'message for build commit'
+git commit -m '<message for build commit>'
 git push -u origin gh-pages
 ```
 
@@ -78,4 +85,4 @@ But actually I have courteously aliased that command for you to
 npm run deploy
 ```
 
-Yer gonna have to set the environment variables GH_CLIENT_ID and GH_CLIENT_SECRET to make it work.
+Yer gonna have to set the environment variables GH_CLIENT_ID and GH_CLIENT_SECRET on the GCP function to make it work.
