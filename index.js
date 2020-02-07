@@ -10,8 +10,7 @@ app.use('*', express.json())
 app.use('*', express.urlencoded({ extended: true }))
 
 app.all('/token', (req, res) => {
-    console.log('request received', req.body)
     token(req, res)
 })
 
-app.listen(PORT, () => console.log('listening on port ' + PORT))
+app.listen(PORT, () => console.log(`listening on port ${PORT}`))
