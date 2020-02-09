@@ -2,10 +2,9 @@ let ghClient = require('./github-client')
 
 exports.token = async (req, res) => {
     let allowedOrigin = process.env.NODE_ENV === 'development'
-        ? 'http://localhost:5000'
+        ? 'http://localhost:3000'
         : 'https://ckingbailey.github.io'
     res.set('Access-Control-Allow-Origin', allowedOrigin)
-    console.log(req.body)
     if (req.method !== 'POST')
         return res.status(405).json({ message: 'nop' })
 
@@ -16,8 +15,8 @@ exports.token = async (req, res) => {
 
     let response
     try {
+        // TODO: resolveWithFullResponse here so that I can use GH response statusCode
         response = await gh.getToken(req.body.code)
-        console.log('token returned from gh-client', response.access_token)
 
         if (response.error) throw response
     } catch (error) {
@@ -26,11 +25,9 @@ exports.token = async (req, res) => {
          * { error: 'bad_verification_code',
          * error_description: 'The code passed is incorrect or expired.' }
          */
-        // what kinds of errors might come from GH?
-        // what is error code for "token expired"?
-        let status = +error.status
-        if (!status && error.error === 'bad_verification_code')
-            status = 400 || 500
+        let status = +error.status || 500
+        if (status === 500 && error.error === 'bad_verification_code')
+            status = 400
         
         if (!error.message)
             error = {
@@ -38,7 +35,7 @@ exports.token = async (req, res) => {
                 message: error.error_description
             }
 
-        console.error('Error:', error)
+        console.error('Error: ', error)
         return res.status(status).json(error)
     }
 

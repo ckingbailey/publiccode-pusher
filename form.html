@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Publiccode.yml form</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        
+        input, select, textarea {
+            display: block;
+        }
+
+        select:not(:last-child),
+        input:not(:last-child),
+        textarea:not(:last-child) {
+            margin-bottom: 1rem;
+        }
+
+        aside {
+            padding: .4rem .3rem .5rem;
+            background-color: #e0e0e0;
+            font-size: .9rem;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <label for="publiccodeYmlVersion">Publiccode YML version</label>
+        <input name="publiccodeYmlVersion" id="publiccodeYmlVersion" type="text" value="0.2" required disabled>
+        
+        <label for="url">Project name</label>
+        <input name="name" id="name" type="text" required>
+        
+        <label for="url">Repository URL</label>
+        <input name="url" id="url" type="text" required>
+
+        <label for="softwareVersion">Version</label>
+        <input name="softwareVersion" id="softwareVersion" type="date">
+        
+        <label for="releaseDate">Release date</label>
+        <input name="releaseDate" id="releaseDate" type="date" required>
+            
+        <label for="platforms">Platforms</label>
+        <aside>ex: web, windows, mac, linux, ios, android</aside>
+        <input name="platforms" id="platforms" type="text" required>
+        
+        <label for="categories">Categories</label>
+        <select name="categories" id="categories" multiple required>
+            <option value="financial-reporting">Financial Reporting</option>
+            <option value=""></option>
+            <option value=""></option>
+            <option value=""></option>
+        </select>
+        
+        <label for="developmentStatus">Development status</label>
+        <select name="developmentStatus" id="developmentStatus" required>
+            <option value="concept">concept</option>
+            <option value="development">development</option>
+            <option value="beta">beta</option>
+            <option value="stable">stable</option>
+            <option value="obsolete">obsolete</option>
+        </select>
+            
+        <label for="softwareType">Development status</label>
+        <select name="softwareType" id="softwareType" required>
+            <option value="standalone/mobile">standalone/mobile</option>
+            <option value="standalone/iot">standalone/iot</option>
+            <option value="standalone/desktop">standalone/desktop</option>
+            <option value="standalone/web">standalone/web</option>
+            <option value="standalone/backend">standalone/backend</option>
+            <option value="standalone/other">standalone/other</option>
+            <option value="addon">addon</option>
+            <option value="library">library</option>
+            <option value="configurationFiles">configurationFiles</option>
+        </select>
+
+        <fieldset>
+            <h2>Description</h2>
+
+            <label for="lang">Primary language</label>
+            <aside>you **must** specify
+                    the language you are editing the text in (using the IETF 
+                    <a href="https://tools.ietf.org/html/bcp47">BCP 47 specifications</a>) by
+                    creating a sub-section with that name. The primary language subtag cannot be
+                    omitted, as mandated by the BCP 47.</aside>
+            <select name="lang" id="lang" required>
+                <option value="en">English</option>
+            </select>
+
+            <label for="localisedName">Localised name</label>
+            <input name="localisedName" id="localisedName" type="text">
+            
+            <label for="genericName">Generic name</label>
+            <aside>ex: Text editor</aside>
+            <input name="genericName" id="genericName" type="text" required>
+
+            <label for="shortDescription">Short description</label>
+            <input name="shortDescription" id="shortDescription" type="text" maxlength="150" required>
+
+            <label for="longDescription">Long description</label>
+            <aside>This key contains a longer description of the software, between 500 and
+                    10000 chars. It is meant to provide an overview of the capabilities of
+                    the software for a potential user. The audience for this text should be
+                    that of users of the software, not developers. You can think of this
+                    text as the description of the software that would be in its website (if
+                    the software had one).</aside>
+            <textarea name="longDescription" id="longDescription" minlength="500" maxlength="10000" required></textarea>
+
+            <label for="feature[]">Features</label>
+            <input name="feature[]" id="feature[]" type="text" maxlength="100" required>
+            <input name="feature[]" id="feature[]" type="text" maxlength="100">
+            <input name="feature[]" id="feature[]" type="text" maxlength="100">
+            <input name="feature[]" id="feature[]" type="text" maxlength="100">
+            <input name="feature[]" id="feature[]" type="text" maxlength="100">
+        </fieldset>
+
+        <fieldset>
+            <h2>Legal</h2>
+
+            <label for="license"></label>
+            <aside>Please refer to the <a href="https://spdx.org/licenses/">SPDX documentation</a> for further information</aside>
+            <input name="license" id="license" type="text" required>
+        </fieldset>
+
+        <fieldset>
+            <h2>Maintenance</h2>
+
+            <label for="type"></label>
+            <select name="type" id="type">
+                <option value="internal">internal</option>
+                <option value="contract">contract</option>
+                <option value="community">community</option>
+                <option value="none">none</option>
+            </select>
+
+            <h3>Contacts</h3>
+            <fieldgroup>
+                <label for="contact[].name">Name</label>
+                <input type="text">
+                <label for="contact[].email">Email</label>
+                <input type="text">
+                <label for="contact[].phone">Phone</label>
+                <input type="text">
+                <label for="contact[].affiliation">Affiliation</label>
+                <input type="text">
+            </fieldgroup>
+        </fieldset>
+            
+        <fieldset>
+            <h2>Localization</h2>
+
+            <label for="localisationReady">Localization-ready?</label>
+            <input name="localisationReady" id="localisationReady" type="checkbox">
+
+            <label for="availableLanguages">Available languages</label>
+            <input name="availableLanguages" id="availableLanguages" type="text" required>
+        </fieldset>
+    </form>
+</body>
+</html>
