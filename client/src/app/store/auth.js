@@ -42,9 +42,9 @@ export function exchangeStateAndCodeForToken(stateToken, code) {
         }).then(body => {
             if (body.access_token) {
                 dispatch(setAuthToken(body.access_token))
-                // TODO: it would be useful if this localStorage operation did not happen here in the action creator
-                window.localStorage.setItem('GH_AUTH_TOKEN', body.access_token)
-                window.localStorage.removeItem('GH_STATE_TOKEN')
+                // TODO: it would be useful if this sessionStorage operation did not happen here in the action creator
+                window.sessionStorage.setItem('GH_AUTH_TOKEN', body.access_token)
+                window.sessionStorage.removeItem('GH_STATE_TOKEN')
             } else {
                 throw new Error('No access token on response')
             }
