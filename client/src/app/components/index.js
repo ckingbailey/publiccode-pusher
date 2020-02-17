@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import {
     setStateToken,
     setAuthToken,
-    exchangeStateAndCodeForToken,
+    exchangeCodeForToken,
     setAuthorize
 } from '../store/auth'
 
@@ -19,7 +19,7 @@ const mapStateToProps = state => ({
 
 let mapDispatchToProps = dispatch => ({
     setAuthToken: token => dispatch(setAuthToken(token)),
-    exchangeStateAndCodeForToken: (stateToken, code) => dispatch(exchangeStateAndCodeForToken(stateToken, code)),
+    exchangeCodeForToken: (stateToken, code) => dispatch(exchangeCodeForToken(stateToken, code)),
     setStateToken: stateToken => dispatch(setStateToken(stateToken)),
     setAuthorize: bool => dispatch(setAuthorize(bool))
 })
@@ -48,10 +48,12 @@ class Index extends Component {
         // if no ghAuthToken found anywhere, check for gh state token & code
         let { code, stateToken } = this.getCodeAndStateFromQs(window.location.search)
         let storedStateToken = window.sessionStorage.getItem('GH_STATE_TOKEN')
-        if (code && stateToken && storedStateToken && stateToken === storedStateToken) return {
+        if (code && stateToken && storedStateToken && stateToken === storedStateToken) {
+            console.log(`code being passed out of checkAuthState is ${code}`)
+             return {
             verdict: 'PENDING',
             payload: code
-        }
+        }}
 
         return false
     }
@@ -64,11 +66,12 @@ class Index extends Component {
     * 3. if no [ GH state token | code ] on `qs` or no [ GH state token ] in `sessionStorage`, user has yet to authorize
     *    - generate Gh state token, hold it in state & save it in sessionStorage
     */
-    async handleAuthState({ verdict, payload }) {
-        if (verdict === 'AUTHENTICATED') {
+    async handleAuthState(authState) {
+        console.log(`handleAuthState received ${JSON.stringify(authState, null, 2)}`)
+        if (authState.verdict === 'AUTHENTICATED') {
             // if token is stored in session but not on redux store, set it on redux store
             if (this.props.ghAuthToken === null) {
-                this.props.setAuthToken(payload)
+                this.props.setAuthToken(authState.payload)
             }
             // if ghAuthToken is on store but not on sessionStorage, we gotta store it on sessionStorage
             else if (!window.sessionStorage.getItem('GH_AUTH_TOKEN')) {
@@ -77,9 +80,9 @@ class Index extends Component {
 
             // Check user permissions on target repo
             await this.checkUserPermission()
-        } else if (verdict === 'PENDING') {
-            this.props.exchangeStateAndCodeForToken(payload)
-
+        } else if (authState.verdict === 'PENDING') {
+            window.history.replaceState('publiccode-pusher login', '', '/')
+            this.props.exchangeCodeForToken(authState.payload)
         } else {
             const ghStateToken = Gh.generateState()
             sessionStorage.setItem('GH_STATE_TOKEN', ghStateToken)

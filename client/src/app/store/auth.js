@@ -10,7 +10,7 @@ export const setStateToken = createAction('SET_STATE_TOKEN')
 export const setGHCode = createAction(SET_GH_CODE)
 export const logout = createAction(LOGOUT)
 
-export function exchangeStateAndCodeForToken(stateToken, code) {
+export function exchangeCodeForToken(code) {
     // fetch ghAuthToken from endpoint appropriate to environment
     return function(dispatch) {
         const TOKEN_SERVER = process.env.NODE_ENV === 'development'
@@ -23,7 +23,7 @@ export function exchangeStateAndCodeForToken(stateToken, code) {
             mode: 'cors',
             method: 'POST',
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
-            body: `code=${code}&state=${stateToken}`
+            body: `code=${code}`
         }).then(res => {
             if (!res.ok) {
                 let bodyMethod = res.headers.get('content-type').includes('application/json')
