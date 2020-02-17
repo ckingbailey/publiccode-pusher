@@ -6,24 +6,25 @@ import { setStateToken, setAuthToken, exchangeStateAndCodeForToken } from '../st
 import Gh from '../utils/GithubClient'
 
 let mapStateToProps = state => ({
-    ghAuthToken: state.auth.ghAuthToken,
-    fetchingToken: state.auth.isFetching,
+    ghStateToken: state.auth.ghStateToken,
     authError: state.auth.error
 })
 
-let mapDispatchToProps = dispatch => ({
-    setAuthToken: token => dispatch(setAuthToken(token)),
-    exchangeStateAndCodeForToken: (stateToken, code) => dispatch(exchangeStateAndCodeForToken(stateToken, code)),
-    setStateToken: stateToken => dispatch(setStateToken(stateToken))
-})
-
 @connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
 )
 class Login extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            targetRepo: ''
+        }
+    }
+
+    handleTextInput(ev) { this.setState({ targetRepo: ev.target.value }) }
+
     render() {
-        let qs = `client_id=8390933a81635970d3b6&state=${this.state.ghStateToken}&scope=public_repo%20read:user`
+        let qs = `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user`
         let errorMessage = this.props.authError && (
             <div style={{
                 backgroundColor: '#e80801',
@@ -41,11 +42,23 @@ class Login extends Component {
         return (
             <Fragment>
                 { errorMessage }
-                <div>
-                    <a
-                        href={ `https://github.com/login/oauth/authorize?${qs}` }
-                        className="editor_button editor_button--primary"
-                    >Login to GitHub</a>
+                <div style={{ display: 'flex', width: '100vw', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <div style={{ marginBottom: '2rem' }}>
+                        <label htmlFor="target-repo">Enter the full URL of the GitHub repo you want to add a publiccode.yml file to</label>
+                        <aside>Enter the complete URL of the repo, starting with &ldquo;https://&rdquo;</aside>
+                        <input
+                            id="target-repo"
+                            type="text"
+                            placeholder="https://github.com/repo-owner/repo-name"
+                            value={ this.state.targetRepo }
+                            onChange={ ev => this.handleTextInput(ev) }
+                        />
+                        <a
+                            href={ `https://github.com/login/oauth/authorize?${qs}` }
+                            onClick={ () => sessionStorage.setItem('TARGET_REPO', this.state.targetRepo) }
+                            className="editor_button editor_button--primary"
+                        >Login to GitHub</a>
+                    </div>
                 </div>
             </Fragment>
         )

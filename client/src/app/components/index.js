@@ -1,7 +1,12 @@
 import React, { Component } from "react"
 import { connect } from "react-redux";
 
-import { setStateToken, setAuthToken, exchangeStateAndCodeForToken } from '../store/auth'
+import {
+    setStateToken,
+    setAuthToken,
+    exchangeStateAndCodeForToken,
+    setAuthorize
+} from '../store/auth'
 
 import Editor from './editor'
 import Login from './Login'
@@ -15,7 +20,8 @@ const mapStateToProps = state => ({
 let mapDispatchToProps = dispatch => ({
     setAuthToken: token => dispatch(setAuthToken(token)),
     exchangeStateAndCodeForToken: (stateToken, code) => dispatch(exchangeStateAndCodeForToken(stateToken, code)),
-    setStateToken: stateToken => dispatch(setStateToken(stateToken))
+    setStateToken: stateToken => dispatch(setStateToken(stateToken)),
+    setAuthorize: bool => dispatch(setAuthorize(bool))
 })
 
 @connect (
@@ -30,6 +36,26 @@ class Index extends Component {
         }
     }
 
+    checkAuthState() {
+        let storedToken = window.sessionStorage.getItem('GH_AUTH_TOKEN')
+
+        // if auth token found, 'AUTHENTICATED'
+        if (storedToken || this.props.ghAuthToken !== null) return {
+            verdict: 'AUTHENTICATED', // TODO: if this is mount, store sessionStorage token on store state
+            payload: storedToken || this.props.ghAuthToken
+        }
+
+        // if no ghAuthToken found anywhere, check for gh state token & code
+        let { code, stateToken } = this.getCodeAndStateFromQs(window.location.search)
+        let storedStateToken = window.sessionStorage.getItem('GH_STATE_TOKEN')
+        if (code && stateToken && storedStateToken && stateToken === storedStateToken) return {
+            verdict: 'PENDING',
+            payload: code
+        }
+
+        return false
+    }
+
     /**
     * 1. check for GH auth token on sessionStorage and Redux store
     *    - if present, user is authorized
@@ -38,42 +64,49 @@ class Index extends Component {
     * 3. if no [ GH state token | code ] on `qs` or no [ GH state token ] in `sessionStorage`, user has yet to authorize
     *    - generate Gh state token, hold it in state & save it in sessionStorage
     */
-    handleAuthState() {
-        // if ghAuthToken is on sessionStorage and not Redux, this must be first load
-        let storedToken = window.sessionStorage.getItem('GH_AUTH_TOKEN') // TODO: use session storage instead
-        if (storedToken || this.props.ghAuthToken !== null) {
+    async handleAuthState({ verdict, payload }) {
+        if (verdict === 'AUTHENTICATED') {
             // if token is stored in session but not on redux store, set it on redux store
-            if (storedToken && this.props.ghAuthToken === null) {
-                this.props.setAuthToken(window.sessionStorage.getItem('GH_AUTH_TOKEN'))
+            if (this.props.ghAuthToken === null) {
+                this.props.setAuthToken(payload)
             }
             // if ghAuthToken is on store but not on sessionStorage, we gotta store it on sessionStorage
-            else if (!storedToken && this.props.ghAuthToken !== null) {
+            else if (!window.sessionStorage.getItem('GH_AUTH_TOKEN')) {
                 this.storeTokenLocally('GH_AUTH_TOKEN', this.props.ghAuthToken)
             }
 
-            // Check user permissions on target repo here
+            // Check user permissions on target repo
+            await this.checkUserPermission()
+        } else if (verdict === 'PENDING') {
+            this.props.exchangeStateAndCodeForToken(payload)
 
-            return
-        }
-
-        // if no ghAuthToken found anywhere, check for gh state token & code
-        let { code, stateToken } = this.getCodeAndStateFromQs(window.location.search)
-        let storedStateToken = window.sessionStorage.getItem('GH_STATE_TOKEN')
-        // if we have code & state tokens match in qs & sessionStorage
-        // use them to fetch ghAuthToken
-        if (code && stateToken && storedStateToken && stateToken === storedStateToken) {
-            this.props.exchangeStateAndCodeForToken(stateToken, code)
         } else {
             const ghStateToken = Gh.generateState()
             sessionStorage.setItem('GH_STATE_TOKEN', ghStateToken)
-            this.setState({ ghStateToken })
+            this.props.setStateToken(ghStateToken)
         }
     }
 
-    storeTokenLocally(key, token) {
-        if (token) {
-            localStorage.setItem(key, token)
+    async checkUserPermission() {
+        let target = window.sessionStorage.getItem('target_repo') // grab repo url that was stored at start of login
+        let [ owner, repo ] = target.replace(/http(?:s):\/\/github.com\//g, '').split('/')
+        let gh = new Gh(this.props.ghAuthToken)
+        let { login } = await gh.get('user')
+        let { permission } = await gh.get('permission', { owner, repo, login })
+        let permissible = [ 'write', 'maintain', 'admin' ]
+        if (permissible.includes(permission)) {
+            this.props.setAuthorize(true)
         }
+    }
+
+    // This function handles the case of trying to store undefined in browser storage
+    // by not storing undefined, or NaN, or null
+    storeTokenLocally(key, token) {
+        if (token !== undefined && !isNaN(token) && token !== null) {
+            window.sessionStorage.setItem(key, token)
+            return token
+        }
+        return false
     }
 
     getCodeAndStateFromQs(qs) {
@@ -90,12 +123,14 @@ class Index extends Component {
         return { code, stateToken }
     }
 
+    /**
+     * When component mounts check where we're at in the auth flow
+     * - if auth token found, check repo permissions
+     * - no auth token, check for state token and code, and exchange code for auth token
+     * - if none of the above found, show login prompt
+     */
     componentDidMount() {
-        this.handleAuthState()
-    }
-
-    componentDidUpdate() {
-        this.handleAuthState()
+        this.handleAuthState(this.checkAuthState())
     }
 
     render() {

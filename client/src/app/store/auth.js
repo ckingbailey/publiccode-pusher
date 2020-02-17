@@ -1,13 +1,12 @@
 import { createAction, handleActions } from "redux-actions"
 
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
-export const SET_STATE_TOKEN = 'SET_STATE_TOKEN'
 export const SET_GH_CODE = 'SET_GH_CODE'
 export const LOGOUT = 'LOGOUT'
 
 const getAuthToken = createAction('GET_AUTH_TOKEN')
 export const setAuthToken = createAction('SET_AUTH_TOKEN')
-export const setStateToken = createAction(SET_STATE_TOKEN)
+export const setStateToken = createAction('SET_STATE_TOKEN')
 export const setGHCode = createAction(SET_GH_CODE)
 export const logout = createAction(LOGOUT)
 
@@ -59,6 +58,7 @@ const initialState = {
     isFetching: false,
     error: null,
     ghAuthToken: null,
+    authorized: false,
     ghStateToken: null,
     ghCode: null
 }
@@ -85,7 +85,7 @@ const reducer = handleActions({
             error: null
         }
     )},
-    SET_STATE_TOKEN: (state, action) => {
+    [ setStateToken ]: (state, action) => {
         return {
             ...state,
             ghStateToken: action.payload
