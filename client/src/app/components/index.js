@@ -25,7 +25,7 @@ let mapDispatchToProps = dispatch => ({
     exchangeCodeForToken: (stateToken, code) => dispatch(exchangeCodeForToken(stateToken, code)),
     setStateToken: stateToken => dispatch(setStateToken(stateToken)),
     setAuthorize: bool => dispatch(setAuthorize(bool)),
-    fetchUserPermission: (owner, repo) => dispatch(fetchUserPermission(owner, repo))
+    fetchUserPermission: (token, owner, repo) => dispatch(fetchUserPermission(token, owner, repo))
 })
 
 @connect (
@@ -88,7 +88,7 @@ class Index extends Component {
             this.storeTokenLocally('GH_AUTH_TOKEN', payload)
             let target = window.sessionStorage.getItem('target_repo') // grab repo url that was stored at start of login
             console.log(`found target repo in storage: ${target}`)
-            let [ owner, repo ] = target.replace(/http(?:s):\/\/github.com\//, '').split('/')
+            let [ owner, repo ] = target.replace(/https*:\/\/github.com\//, '').split('/')
             console.log(`extracted owner and repo from target: ${owner}, ${repo}`)
             this.props.fetchUserPermission(this.props.ghAuthToken, owner, repo)
         } else if (verdict === 'pending') {
