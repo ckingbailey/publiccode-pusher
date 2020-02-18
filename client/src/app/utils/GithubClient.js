@@ -2,9 +2,19 @@ function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
     return { get }
 
-    function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
+    async function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
         let { url, options } = getRequestParamsForEndpoint(endpoint, data)
-        let res = fetch(url, options)
+        let res = await fetch(url, options)
+        let json = await res.json()
+
+        // if bad HTTP repsonse, construct a nice error, and throw it
+        if (!res.ok) {
+            let { message } = json
+            let er = Error(message)
+            er.code = res.status
+            throw er
+        }
+
         return res
     }
 
