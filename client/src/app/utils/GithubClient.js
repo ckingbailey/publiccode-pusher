@@ -11,7 +11,7 @@ function GithubClient(token) {
         if (!res.ok) {
             let { message } = json
             let er = Error(message)
-            er.code = res.status
+            er.code = +res.status
             throw er
         }
 
@@ -21,7 +21,6 @@ function GithubClient(token) {
     function getRequestParamsForEndpoint(endpoint, params) {
         switch (endpoint) {
             case 'permission':
-                console.log(`GH.get('permission') received params ${JSON.stringify(params)}`)
                 return {
                     url: `https://api.github.com/repos/${params.owner}/${params.repo}/collaborators/${params.user}/permission`,
                     options: {

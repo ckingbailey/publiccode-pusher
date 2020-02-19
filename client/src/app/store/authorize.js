@@ -18,16 +18,18 @@ export const fetchUserPermission = (token, owner, repo) => async function(dispat
 
     try {
         let { login } = await gh.get('user')
-        console.log(`try fetching permissions using owner, repo & login, ${owner}, ${repo} & ${login}`)
         let { permission } = await gh.get('permission', { owner, repo, user: login })
         
         if (permissible.includes(permission)) {
-            console.log(`permission level "${permission}" is permissible: ${permissible.includes(permission)}`)
             dispatch(setAuthorize('authorized'))
         } else dispatch(setAuthorize('unauthorized'))
     } catch (er) {
-        console.error(er)
-        dispatch(setAuthorize(er))
+        if (er.code === 403) {
+            dispatch(setAuthorize('unauthorized'))
+        } else {
+            console.error(er)
+            dispatch(setAuthorize(er))
+        }
     }
 }
 

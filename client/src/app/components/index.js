@@ -41,7 +41,6 @@ class Index extends Component {
 
     checkAuthState() {
         let storedToken = window.sessionStorage.getItem('GH_AUTH_TOKEN')
-        console.log(`retrieved stored token ${storedToken}`)
 
         // if auth token found, 'authenticated'
         if (this.props.authenticated === true && storedToken) {
@@ -102,7 +101,6 @@ class Index extends Component {
     fetchPermissionForStoredRepo(token) {
         let target = window.sessionStorage.getItem('target_repo') // grab repo url that was stored before redirect to GitHub auth page
         let [ owner, repo ] = target.replace(/https*:\/\/github.com\//, '').split('/')
-        console.log(`got owner, ${owner}, and repo name, ${repo} for target repo ${target}`)
         this.props.fetchUserPermission(token, owner, repo)
     }
 
