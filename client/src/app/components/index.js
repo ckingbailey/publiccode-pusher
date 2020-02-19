@@ -146,7 +146,7 @@ class Index extends Component {
 
     render() {
         return (
-            this.props.authenticated
+            this.props.authorized === 'authorized'
             ? <Editor/>
             : <Login/>
         )
