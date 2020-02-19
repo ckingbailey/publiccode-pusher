@@ -1,13 +1,13 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from "react-redux";
 
-import { setStateToken, setAuthToken, exchangeStateAndCodeForToken } from '../store/auth'
-
-import Gh from '../utils/GithubClient'
+import LoginForm from './LoginForm'
 
 let mapStateToProps = state => ({
     ghStateToken: state.auth.ghStateToken,
-    authError: state.auth.error
+    authError: state.auth.error,
+    authFetching: state.auth.isFetching,
+    authorized: state.auth.authorized
 })
 
 @connect(
@@ -24,7 +24,6 @@ class Login extends Component {
     handleTextInput(ev) { this.setState({ targetRepo: ev.target.value }) }
 
     render() {
-        let qs = `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user`
         let errorMessage = this.props.authError && (
             <div style={{
                 backgroundColor: '#e80801',
@@ -39,25 +38,43 @@ class Login extends Component {
             </div>
         )
 
+        let unauthorized = this.props.authorized === 'unauthorized' && (
+            <div style={{
+                backgroundColor: '#e8e8e8',
+                width: '100%',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                padding: '.25rem',
+                color: '#004080',
+                textAlign: 'center'
+            }}>
+                <h3>Looks like you don&apos;t have sufficient permissions on the GitHub repository</h3>
+                <p>Talk to a project admin to get your permissions elevated</p>
+            </div>
+        )
+
         return (
             <Fragment>
                 { errorMessage }
+                { unauthorized }
                 <div style={{ display: 'flex', width: '100vw', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     <div style={{ marginBottom: '4rem', paddingTop: '2rem' }}>
-                        <label htmlFor="target-repo">Enter the full URL of the GitHub repo you want to add a publiccode.yml file to</label>
-                        <aside>Enter the complete URL of the repo, starting with &ldquo;https://&rdquo;</aside>
-                        <input
-                            id="target-repo"
-                            type="text"
-                            placeholder="https://github.com/repo-owner/repo-name"
-                            value={ this.state.targetRepo }
-                            onChange={ ev => this.handleTextInput(ev) }
-                        />
-                        <a
-                            href={ `https://github.com/login/oauth/authorize?${qs}` }
-                            onClick={ () => sessionStorage.setItem('target_repo', this.state.targetRepo) }
-                            className="editor_button editor_button--primary"
-                        >Login to GitHub</a>
+                        {
+                            this.props.authFetching
+                            ? (
+                                <div>
+                                    <div className='spinner-container'>
+                                        <i className='loading-spinner'></i>
+                                    </div>
+                                    <span>{ this.props.authFetching && 'Authorizing on Github' }</span>
+                                </div>
+                            ) : <LoginForm
+                                targetRepo={ this.state.targetRepo } 
+                                handleTextInput={ ev => this.handleTextInput(ev) }
+                                qs={ `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user` }
+                              />
+                        }
                     </div>
                 </div>
             </Fragment>

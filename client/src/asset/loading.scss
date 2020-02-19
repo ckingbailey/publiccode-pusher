@@ -1,0 +1,22 @@
+.spinner-container {
+    --element-height: 1rem;
+    height: calc(var(--element-height) * 2)
+}
+
+.loading-spinner {
+    display: block;
+    margin-left: auto; margin-right: auto;
+    height: var(--element-height); width: .125rem;
+    background-color: #5a768a;
+    transform-origin: bottom;
+    animation: 3s linear infinite spin;
+}
+
+@keyframes spin {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: 360deg;
+    }
+}
