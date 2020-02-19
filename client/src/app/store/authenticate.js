@@ -1,5 +1,5 @@
 import { createAction, handleActions } from "redux-actions"
-import Gh from '../utils/GithubClient'
+import Gh from '../utils/GithubClient' // TODO: use Gh client to handle authentication
 
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_GH_CODE = 'SET_GH_CODE'
@@ -17,7 +17,6 @@ const initialState = {
     isFetching: false,
     error: null,
     authenticated: false,
-    authorized: '',
     ghAuthToken: null,
     ghStateToken: null,
     ghCode: null
@@ -66,28 +65,6 @@ export function exchangeCodeForToken(code) {
             dispatch(setAuthToken(er))
         })
     }
-}
-
-export const fetchUserPermission = (token, owner, repo) => async function(dispatch) {
-    dispatch(getPermission())
-
-    let permissible = [ 'write', 'maintain', 'admin' ]
-    let gh = new Gh(token)
-
-    try {
-        let { login } = await gh.get('user')
-        console.log(`try fetching permissions using owner, repo & login, ${owner}, ${repo} & ${login}`)
-        let { permission } = await gh.get('permission', { owner, repo, user: login })
-        
-        if (permissible.includes(permission)) {
-            console.log(`permission level "${permission}" is permissible: ${permissible.includes(permission)}`)
-            dispatch(setAuthorize('authorized'))
-        } else dispatch(setAuthorize('unauthorized'))
-    } catch (er) {
-        console.error(er)
-        dispatch(setAuthorize(er))
-    }
-
 }
 
 const reducer = handleActions({

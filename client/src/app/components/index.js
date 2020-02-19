@@ -4,10 +4,9 @@ import { connect } from "react-redux";
 import {
     setStateToken,
     setAuthToken,
-    exchangeCodeForToken,
-    setAuthorize,
-    fetchUserPermission
-} from '../store/auth'
+    exchangeCodeForToken
+} from '../store/authenticate'
+import { setAuthorize, fetchUserPermission } from '../store/authorize'
 
 import Editor from './editor'
 import Login from './Login'
@@ -15,9 +14,9 @@ import Login from './Login'
 import Gh from '../utils/GithubClient'
 
 const mapStateToProps = state => ({
-    authenticated: state.auth.authenticated,
-    authorized: state.auth.authorized,
-    ghAuthToken: state.auth.ghAuthToken
+    authenticated: state.authenticate.authenticated,
+    authorized: state.authenticate.authorized,
+    ghAuthToken: state.authenticate.ghAuthToken
 })
 
 let mapDispatchToProps = dispatch => ({
@@ -42,16 +41,17 @@ class Index extends Component {
 
     checkAuthState() {
         let storedToken = window.sessionStorage.getItem('GH_AUTH_TOKEN')
+        console.log(`retrieved stored token ${storedToken}`)
 
-        // if auth token found, 'AUTHENTICATED'
+        // if auth token found, 'authenticated'
         if (this.props.authenticated === true && storedToken) {
             return { verdict: 'authenticated' }
-        } else if (this.props.ghAuthToken) {
+        } else if (this.props.ghAuthToken) { // this case should only occur on cmptDidUpdate
             return {
                 verdict: 'newly_authenticated',
                 payload: this.props.ghAuthToken
             }
-        } else if (storedToken) {
+        } else if (storedToken) { // this case should only occur on returning to page within same browser sesh
             return {
                 verdict: 'previously_authenticated',
                 payload: storedToken
@@ -84,13 +84,10 @@ class Index extends Component {
         if (verdict === 'authenticated') return
         else if (verdict === 'previously_authenticated') {
             this.props.setAuthToken(payload)
+            this.fetchPermissionForStoredRepo(payload)
         } else if (verdict === 'newly_authenticated') {
             this.storeTokenLocally('GH_AUTH_TOKEN', payload)
-            let target = window.sessionStorage.getItem('target_repo') // grab repo url that was stored at start of login
-            console.log(`found target repo in storage: ${target}`)
-            let [ owner, repo ] = target.replace(/https*:\/\/github.com\//, '').split('/')
-            console.log(`extracted owner and repo from target: ${owner}, ${repo}`)
-            this.props.fetchUserPermission(this.props.ghAuthToken, owner, repo)
+            this.fetchPermissionForStoredRepo(payload)
         } else if (verdict === 'pending') {
             window.history.replaceState('publiccode-pusher login', '', '/')
             window.sessionStorage.removeItem('GH_STATE_TOKEN')
@@ -100,6 +97,13 @@ class Index extends Component {
             window.sessionStorage.setItem('GH_STATE_TOKEN', ghStateToken)
             this.props.setStateToken(ghStateToken)
         }
+    }
+
+    fetchPermissionForStoredRepo(token) {
+        let target = window.sessionStorage.getItem('target_repo') // grab repo url that was stored before redirect to GitHub auth page
+        let [ owner, repo ] = target.replace(/https*:\/\/github.com\//, '').split('/')
+        console.log(`got owner, ${owner}, and repo name, ${repo} for target repo ${target}`)
+        this.props.fetchUserPermission(token, owner, repo)
     }
 
     // This function handles the case of trying to store undefined in browser storage

@@ -4,10 +4,12 @@ import { connect } from "react-redux";
 import LoginForm from './LoginForm'
 
 let mapStateToProps = state => ({
-    ghStateToken: state.auth.ghStateToken,
-    authError: state.auth.error,
-    authFetching: state.auth.isFetching,
-    authorized: state.auth.authorized
+    ghStateToken: state.authenticate.ghStateToken,
+    authenticateError: state.authenticate.error,
+    authenticateFetching: state.authenticate.isFetching,
+    authorizeError: state.authorize.error,
+    authorizeFetching: state.authorize.isFetching,
+    authorized: state.authorize.authorized
 })
 
 @connect(
