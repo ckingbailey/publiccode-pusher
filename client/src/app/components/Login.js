@@ -2,13 +2,11 @@ import React, { Component, Fragment } from 'react'
 import { connect } from "react-redux";
 
 import LoginForm from './LoginForm'
+import RepoForm from './RepoForm'
 
 let mapStateToProps = state => ({
     ghStateToken: state.authenticate.ghStateToken,
-    authenticateError: state.authenticate.error,
-    authenticateFetching: state.authenticate.isFetching,
-    authorizeError: state.authorize.error,
-    authorizeFetching: state.authorize.isFetching,
+    authenticated: state.authenticate.authenticated,
     authorized: state.authorize.authorized
 })
 
@@ -24,6 +22,12 @@ class Login extends Component {
     }
 
     handleTextInput(ev) { this.setState({ targetRepo: ev.target.value }) }
+
+    handleSubmit(ev, repo) {
+        ev.preventDefault()
+        sessionStorage.setItem('target_repo', repo)
+        this.props.authorize.setRepo(repo)
+    }
 
     render() {
         let errorMessage = this.props.authError && (
@@ -58,26 +62,26 @@ class Login extends Component {
             </div>
         )
 
+        let qs = `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user`
+
         return (
             <Fragment>
-                { errorMessage }
+                { errorMessage /* TODO: These should both be global */ }
                 { unauthorized }
                 <div style={{ display: 'flex', paddingTop: '6rem', width: '100vw', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     <div style={{ marginBottom: '8rem' }}>
                         {
-                            this.props.authFetching
+                            this.props.authenticated
                             ? (
-                                <div>
-                                    <div className='spinner-container'>
-                                        <i className='loading-spinner'></i>
-                                    </div>
-                                    <span>{ this.props.authFetching && 'Authorizing on Github' }</span>
-                                </div>
+                                <RepoForm
+                                    targetRepo={ this.state.targetRepo }
+                                    handleTextInput={ ev => this.handleTextInput(ev) }
+                                    handleSubmit={ ev => this.handleSubmit(ev, this.state.targetRepo) }
+                                />
                             ) : <LoginForm
-                                unauthorized={ Boolean(unauthorized) }
-                                targetRepo={ this.state.targetRepo } 
+                                targetRepo={ this.state.targetRepo }
                                 handleTextInput={ ev => this.handleTextInput(ev) }
-                                qs={ `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user` }
+                                qs={ qs }
                               />
                         }
                     </div>

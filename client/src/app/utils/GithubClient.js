@@ -1,6 +1,7 @@
 function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
-    return { get }
+    let access_token = token
+    return { get, setToken }
 
     async function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
         let { url, options } = getRequestParamsForEndpoint(endpoint, data)
@@ -16,6 +17,10 @@ function GithubClient(token) {
         }
 
         return json
+    }
+
+    function setToken(token) {
+        access_token = token
     }
 
     function getRequestParamsForEndpoint(endpoint, params) {
@@ -48,7 +53,7 @@ function GithubClient(token) {
                     url: 'https://api.github.com/user',
                     options: {
                         headers: {
-                            Authorization: `token ${token}`
+                            Authorization: `token ${access_token}`
                         }
                     }
                 }
@@ -57,7 +62,7 @@ function GithubClient(token) {
                     url: `https://api.github.com/users/${params.login}/repos`,
                     options: {
                         headers: {
-                            Authorization: `token ${token}`
+                            Authorization: `token ${access_token}`
                         }
                     }
                 }

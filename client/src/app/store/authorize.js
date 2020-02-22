@@ -1,5 +1,6 @@
 import { createAction, handleActions } from "redux-actions"
 import Gh from '../utils/GithubClient'
+import { getRepoFromBrowserStorage } from '../utils/browserStorage'
 
 const getPermission = createAction('GET_PERMISSION')
 const setAuthorize = createAction('SET_AUTHORIZE')
@@ -8,6 +9,15 @@ const initialState = {
     isFetching: false,
     error: null,
     authorized: '',
+}
+
+/**
+ * Not an action creator
+ * This function grabs the target_repo from sessionStorage
+ */
+export const fetchUserPermissionFromBrowserStorage = token => async dispatch => {
+    let { owner, repo } = getRepoFromBrowserStorage()
+    dispatch(fetchUserPermission(token, owner, repo))
 }
 
 export const fetchUserPermission = (token, owner, repo) => async function(dispatch) {
@@ -22,11 +32,17 @@ export const fetchUserPermission = (token, owner, repo) => async function(dispat
         
         if (permissible.includes(permission)) {
             dispatch(setAuthorize('authorized'))
-        } else dispatch(setAuthorize('unauthorized'))
+        } else {
+            dispatch(setAuthorize('unauthorized'))
+            window.sessionStorage.removeItem('target_repo')
+        }
     } catch (er) {
         if (er.code === 403) {
             dispatch(setAuthorize('unauthorized'))
+            window.sessionStorage.removeItem('target_repo')
         } else {
+            // QUESTION: what kinds of errors might occur here
+            // that might make us want to remove target_repo from browser storage?
             console.error(er)
             dispatch(setAuthorize(er))
         }
