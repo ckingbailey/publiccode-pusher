@@ -3,11 +3,19 @@ import Gh from '../utils/GithubClient'
 
 const getPermission = createAction('GET_PERMISSION')
 const setAuthorize = createAction('SET_AUTHORIZE')
+const setRepo = createAction('SET_REPO')
+const unsetRepo = createAction('UNSET_REPO')
 
 const initialState = {
     isFetching: false,
     error: null,
     authorized: '',
+    repo: null
+}
+
+export const unsetAndUnstoreRepo = () => {
+    window.sessionStorage.removeItem('target_repo')
+    return unsetRepo()
 }
 
 export const fetchUserPermission = (token, url) => async function(dispatch) {
@@ -25,6 +33,7 @@ export const fetchUserPermission = (token, url) => async function(dispatch) {
         let { permission } = await gh.get('permission', { owner, repo, user: login })
 
         if (permissible.includes(permission)) {
+            dispatch(setRepo(url))
             dispatch(setAuthorize('authorized'))
         } else {
             dispatch(setAuthorize('unauthorized'))
@@ -64,7 +73,16 @@ const reducer = handleActions({
             isFetching: false,
             error: null
         }
-    )
+    ),
+    [ setRepo ]: (state, action) => ({
+        ...state,
+        repo: action.payload
+    }),
+    [ unsetRepo ]: state => ({
+        ...state,
+        repo: null,
+        authorized: ''
+    })
 }, initialState)
 
 export default reducer

@@ -150,7 +150,7 @@ class Index extends Component {
 
     render() {
         return (
-            this.props.authenticateFetching
+            this.props.authenticateFetching || this.props.authorizeFetching
             ? <LoadScreen />
             : this.props.authorized === 'authorized'
                 ? <Editor/>

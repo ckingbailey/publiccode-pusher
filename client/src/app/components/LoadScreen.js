@@ -1,9 +1,9 @@
 import React from 'react'
 
 const LoadScreen = () => (
-    <div>
-        <div className='spinner-container'>
-            <i className='loading-spinner'></i>
+    <div className="load-screen__container">
+        <div className='load-screen__spinner-container'>
+            <i className='load-screen__spinner'></i>
         </div>
         <span>Authorizing on Github</span>
     </div>

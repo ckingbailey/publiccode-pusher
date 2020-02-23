@@ -48,24 +48,30 @@ class head extends Component {
   render() {
     let { info } = this.state;
     return (
-      <div className="content__head">
-        <div className="content__head__title">publiccode.yml Pusher</div>
-        <div className="content__head__help">
-          <div>
-            <a className="pr-5" href={privacyPolicyUrl} rel="noopener noreferrer" target="_blank">
-              Privacy policy
-            </a>
-            <a href={repositoryUrl} rel="noopener noreferrer" target="_blank">
-              Need help?
-            </a>
+      <div>
+        <div className="content__head">
+          <div className="content__head__title">publiccode.yml Pusher</div>
+          <div className="content__head__help">
+            <div>
+              <a className="pr-5" href={privacyPolicyUrl} rel="noopener noreferrer" target="_blank">
+                Privacy policy
+              </a>
+              <a href={repositoryUrl} rel="noopener noreferrer" target="_blank">
+                Need help?
+              </a>
+            </div>
+            <div>
+              {info && (
+                <span className="content__head__status">
+                  Last generation: {info}
+                </span>
+              )}
+            </div>
           </div>
-          <div>
-            {info && (
-              <span className="content__head__status">
-                Last generation: {info}
-              </span>
-            )}
-          </div>
+        </div>
+        <div className="content__target-repo">
+          <h2>Connected to { this.props.targetRepo }</h2>
+          <button onClick={ ev => this.props.handleClick(ev) }>Connect to a different repo</button>
         </div>
       </div>
     );
