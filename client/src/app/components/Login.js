@@ -3,15 +3,22 @@ import { connect } from "react-redux";
 
 import LoginForm from './LoginForm'
 import RepoForm from './RepoForm'
+import { fetchUserPermission } from '../store/authorize';
 
 let mapStateToProps = state => ({
+    ghAuthToken: state.authenticate.ghAuthToken,
     ghStateToken: state.authenticate.ghStateToken,
     authenticated: state.authenticate.authenticated,
     authorized: state.authorize.authorized
 })
 
+let mapDispatchToProps = dispatch => ({
+    fetchUserPermission: (token, owner, repo) => dispatch(fetchUserPermission(token, owner, repo))
+})
+
 @connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )
 class Login extends Component {
     constructor(props) {
@@ -26,7 +33,7 @@ class Login extends Component {
     handleSubmit(ev, repo) {
         ev.preventDefault()
         sessionStorage.setItem('target_repo', repo)
-        this.props.authorize.setRepo(repo)
+        this.props.fetchUserPermission(this.props.ghAuthToken, repo)
     }
 
     render() {

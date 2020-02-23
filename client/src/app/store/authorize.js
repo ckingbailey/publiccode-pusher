@@ -1,6 +1,5 @@
 import { createAction, handleActions } from "redux-actions"
 import Gh from '../utils/GithubClient'
-import { getRepoFromBrowserStorage } from '../utils/browserStorage'
 
 const getPermission = createAction('GET_PERMISSION')
 const setAuthorize = createAction('SET_AUTHORIZE')
@@ -11,25 +10,20 @@ const initialState = {
     authorized: '',
 }
 
-/**
- * Not an action creator
- * This function grabs the target_repo from sessionStorage
- */
-export const fetchUserPermissionFromBrowserStorage = token => async dispatch => {
-    let { owner, repo } = getRepoFromBrowserStorage()
-    dispatch(fetchUserPermission(token, owner, repo))
-}
-
-export const fetchUserPermission = (token, owner, repo) => async function(dispatch) {
+export const fetchUserPermission = (token, url) => async function(dispatch) {
     dispatch(getPermission())
-
+    
     let permissible = [ 'write', 'maintain', 'admin' ]
     let gh = new Gh(token)
-
+    
     try {
+        let [ owner, repo ] = url.replace(/https*:\/\/github.com\//, '').split('/')
+
+        if (!owner || !repo) throw Error(`${url} is not a valid GitHub repository URL`)
+
         let { login } = await gh.get('user')
         let { permission } = await gh.get('permission', { owner, repo, user: login })
-        
+
         if (permissible.includes(permission)) {
             dispatch(setAuthorize('authorized'))
         } else {
@@ -41,8 +35,10 @@ export const fetchUserPermission = (token, owner, repo) => async function(dispat
             dispatch(setAuthorize('unauthorized'))
             window.sessionStorage.removeItem('target_repo')
         } else {
-            // QUESTION: what kinds of errors might occur here
+            // QUESTION: What kinds of errors might occur here
             // that might make us want to remove target_repo from browser storage?
+            // QUESTION: What kinds of errors might occur here
+            // that might make us want to set 'unauthorized'?
             console.error(er)
             dispatch(setAuthorize(er))
         }
@@ -65,6 +61,7 @@ const reducer = handleActions({
         : {
             ...state,
             authorized: action.payload,
+            isFetching: false,
             error: null
         }
     )

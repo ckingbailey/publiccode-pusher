@@ -5,7 +5,7 @@ const LoadScreen = () => (
         <div className='spinner-container'>
             <i className='loading-spinner'></i>
         </div>
-        <span>{this.props.authFetching && 'Authorizing on Github'}</span>
+        <span>Authorizing on Github</span>
     </div>
 )
 

@@ -13,7 +13,6 @@ import LoadScreen from './LoadScreen'
 import Login from './Login'
 
 import Gh from '../utils/GithubClient'
-import { getRepoFromBrowserStorage } from '../utils/browserStorage'
 
 const mapStateToProps = state => ({
     authenticateError: state.authenticate.error,
@@ -21,7 +20,7 @@ const mapStateToProps = state => ({
     authenticated: state.authenticate.authenticated,
     authorizeError: state.authorize.error,
     authorizeFetching: state.authorize.isFetching,
-    authorized: state.authenticate.authorized,
+    authorized: state.authorize.authorized,
     ghAuthToken: state.authenticate.ghAuthToken,
     targetRepo: state.authorize.targetRepo
 })
@@ -47,22 +46,21 @@ class Index extends Component {
     }
 
     checkAuthState() {
-        let access_token = window.sessionStorage.getItem('GH_AUTH_TOKEN')
-        let { owner, repo } = getRepoFromBrowserStorage()
+        let access_token = window.sessionStorage.getItem('GH_ACCESS_TOKEN')
+        let target_repo = window.sessionStorage.getItem('target_repo')
 
         // first case can only occur on cmpntDidUpdate()
         // if auth token found in store.state and stored on browser, 'authenticated'
         if (this.props.authenticated === true && access_token) {
             return { verdict: 'authenticated' }
-        } else if (access_token && owner && repo) {
+        } else if (access_token && target_repo) {
             // this case should only occur on returning to page within same browser sesh
             // user has token already, and repo should only be stored if user has permission on it
             return {
                 verdict: 'previously_authorized',
                 payload: [ // return iterable payload so I can spread it as function args
                     access_token,
-                    owner,
-                    repo // re-check permissions below
+                    target_repo // re-check permissions below
                 ]
             }
         } else if (access_token) {
@@ -101,7 +99,7 @@ class Index extends Component {
         else if (verdict === 'previously_authorized') {
             // previously authorized, try to authorize again
             this.props.setAuthToken(payload[0])
-            this.fetchUserPermission(...payload)
+            this.props.fetchUserPermission(...payload)
         } else if (verdict === 'previously_authenticated') {
             // previously auathenticated, no need to authorize again
             // we need to collect a new repo from user

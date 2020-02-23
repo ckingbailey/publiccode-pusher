@@ -1,13 +1,12 @@
 import { createAction, handleActions } from "redux-actions"
 import Gh from '../utils/GithubClient' // TODO: use Gh client to handle authentication
-import { fetchUserPermissionFromBrowserStorage } from './authorize'
+import { fetchUserPermission } from './authorize'
 
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_GH_CODE = 'SET_GH_CODE'
 export const LOGOUT = 'LOGOUT'
 
 const getAuthToken = createAction('GET_AUTH_TOKEN')
-const getPermission = createAction('GET_PERMISSION')
 export const setAuthToken = createAction('SET_AUTH_TOKEN')
 export const setStateToken = createAction('SET_STATE_TOKEN')
 export const setGHCode = createAction(SET_GH_CODE)
@@ -40,7 +39,8 @@ export function exchangeCodeForToken(code) {
             dispatch(setAuthToken(access_token))
             window.sessionStorage.setItem('GH_ACCESS_TOKEN', access_token)
 
-            dispatch(fetchUserPermissionFromBrowserStorage(access_token))
+            let target_repo = window.sessionStorage.getItem('target_repo')
+            dispatch(fetchUserPermission(access_token, target_repo))
         } catch (er) {
             console.error(er)
             dispatch(setAuthToken(er))
@@ -52,10 +52,6 @@ const reducer = handleActions({
     [ getAuthToken ]: state => ({
         ...state,
         isFetching: true,
-    }),
-    [ getPermission ]: state => ({
-        ...state,
-        isFetching: true
     }),
     [ setAuthToken ]: (state, action) => {
         return (
