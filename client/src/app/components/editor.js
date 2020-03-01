@@ -4,6 +4,7 @@ import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
 import { unsetAndUnstoreRepo } from '../store/authorize';
+import { getMasterBranchSHA } from '../store/repo';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
@@ -30,7 +31,8 @@ const mapStateToProps = state => {
     cache: state.cache,
     form: state.form,
     yamlLoaded: state.yamlLoaded,
-    targetRepo: state.authorize.repo
+    targetRepo: state.authorize.repo,
+    token: state.authenticate.ghAuthToken
   };
 };
 
@@ -40,7 +42,8 @@ const mapDispatchToProps = dispatch => {
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
-    unsetRepo: () => dispatch(unsetAndUnstoreRepo())
+    unsetRepo: () => dispatch(unsetAndUnstoreRepo()),
+    getMasterBranchSHA: (token, repo) => dispatch(getMasterBranchSHA(token, repo))
   };
 };
 
@@ -84,21 +87,16 @@ class Editor extends Component {
   }
 
   async initData(country = null) {
-    //has state
-    // console.log("initData");
     let { elements, blocks, allFields } = await getData(country);
     this.setState({ elements, blocks, country, allFields });
     this.initBootstrap();
   }
 
   parseYml(yaml) {
-    //HAS STATE
     this.setState({ loading: true });
     let obj = null;
     try {
       obj = jsyaml.load(yaml);
-      // let errors =   fv.validatePubliccodeYml(obj);
-      // if (errors) alert(errors);
     } catch (e) {
       alert("Error loading yaml");
       return;
@@ -112,10 +110,7 @@ class Editor extends Component {
 
     // let currentValues = null;
     let currentLanguage = languages ? languages[0] : null;
-    // if (currentLanguage) currentValues = values[currentLanguage];
 
-    //UPDATE STATE
-    // console.log('update state');
     this.setState({
       yaml,
       languages,
@@ -139,6 +134,12 @@ class Editor extends Component {
     // create new branch
     // commit yml file to new branch
     // open PR for branch
+    // QUESTION: Can I push the object as-is to GH as a .yml file?
+    // ANSWER: No, it's a POJO, not yaml format
+    // ANSWER: The good stuff is produced by the parseYaml function,
+    // which calls jsyaml
+    // That parsed yaml should be pushable to GH
+    // ANSWER, cont'd: er, maybe not. What is this getRemoteYml?
     this.showResults(obj);
   }
 
@@ -364,6 +365,11 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
+  getMasterBranch() {
+    console.log(`fire getMasterBranch with repo ${this.props.targetRepo}`)
+    this.props.getMasterBranchSHA(this.props.token, this.props.targetRepo)
+  }
+
   render() {
     let {
       currentLanguage,
@@ -399,9 +405,9 @@ class Editor extends Component {
                 <EditorForm
                   activeSection={activeSection}
                   onAccordion={this.onAccordion.bind(this)}
-                  onSubmit={this.generate.bind(this)}
+                  onSubmit={ () => this.getMasterBranch() }
                   data={blocks}
-                  validate={this.validate.bind(this)}
+                  // validate={this.validate.bind(this)}
                   country={country}
                   switchCountry={this.switchCountry.bind(this)}
                   errors={errors}

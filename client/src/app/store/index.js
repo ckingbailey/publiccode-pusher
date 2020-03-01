@@ -5,13 +5,15 @@ import notifications from "./notifications"
 import infobox from "./infobox"
 import authenticate from './authenticate'
 import authorize from './authorize'
+import repo from './repo'
 
 const rootReducer = combineReducers({
   form: formReducer,
   notifications: notifications,
   infobox: infobox,
   authenticate,
-  authorize
+  authorize,
+  repo
 })
 
 // TODO: only add DEVTOOLS_EXTENSION in development
