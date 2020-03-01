@@ -1,0 +1,56 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+name: publiccode pusher
+url: 'https://github.com/ckingbailey/publiccode-pusher'
+releaseDate: '2020-03-01'
+developmentStatus: development
+softwareType: standalone/desktop
+platforms:
+  - web
+categories:
+  - agile-project-management
+maintenance:
+  type: community
+  contacts:
+    - name: Colin
+      email: colin@openoakland.org
+      affiliation: OpenOakland
+legal:
+  license: AGPL-3.0-or-later
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
+description:
+  us:
+    genericName: publiccode pusher
+    shortDescription: push publiccode.yml to your repo
+    longDescription: >
+      This is a cross-brigade collaborative project among several code for
+      america brigades. We are endeavoring to catalogue all the projects that
+      all the brigades are working on with the purpose of facilitating further
+      cross-brigade collaboration, assisting brigade leadership with tracking
+      and marketing their own projects, and helping the mothership Code for
+      America organization with same.
+
+
+      This web application is one piece of our strategy to better index active
+      projects. Project maintainers can influence how the indexer "sees" their
+      project by putting a descriptive publiccode.yml file in their repository.
+      This application enables that by providing a web form that will validate
+      and upload a new publiccode.yml file.
+
+
+      The application comprises a React + Redux application on the frontend
+      (bitten completely off Developers Italia) and a single cloud function on
+      the backend, for authenticating on GitHub.
+
+
+      Is this enough characters yet? Nope, I think it needs to be 1000. I really
+      need to figure out how the validator works so I can either turn it off or
+      modify it.
+    features:
+      - web-form
