@@ -379,7 +379,7 @@ class Editor extends Component {
       let yaml = staticFieldsYaml + tmpYaml;
 
       let res = await gh.repo.commit(owner, repo, btoa(yaml))
-      console.log(`pushed yaml file and got response ${res}`)
+      console.log(`pushed yaml file and got response`, res)
 
       this.setState({ yaml, loading: false });
     } catch (e) {
@@ -424,7 +424,7 @@ class Editor extends Component {
                   onAccordion={this.onAccordion.bind(this)}
                   onSubmit={ () => this.commitYaml() }
                   data={blocks}
-                  // validate={this.validate.bind(this)}
+                  validate={this.validate.bind(this)}
                   country={country}
                   switchCountry={this.switchCountry.bind(this)}
                   errors={errors}
