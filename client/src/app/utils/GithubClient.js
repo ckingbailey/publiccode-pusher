@@ -76,12 +76,18 @@ function GithubClient(token) {
             open: async function openPR(owner, repo) {
                 let target = `https://api.github.com/repos/${owner}/${repo}/pulls`
                 let method = 'POST'
-                let body = {
+                let body = JSON.stringify({
                     title: 'Add publiccode.yml describing this project',
-                    head: 'Publiccode-Pusher/add-publiccode-yml',
+                    head: TARGET_BRANCH,
                     base: 'master',
-                    body: '<put a nice PR message here>'
+                    body: 'Add publiccode.yml file describing this project'
+                })
+                if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
+                let headers = {
+                    Authorization: `token ${access_token}`,
+                    'Content-Type': 'application/json'
                 }
+                return await fetchJson(target, { method, body, mode: 'cors', headers})
             }
         }
     }

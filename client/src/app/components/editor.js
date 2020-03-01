@@ -378,8 +378,12 @@ class Editor extends Component {
       let tmpYaml = jsyaml.dump(mergedValue);
       let yaml = staticFieldsYaml + tmpYaml;
 
-      let res = await gh.repo.commit(owner, repo, btoa(yaml))
-      console.log(`pushed yaml file and got response`, res)
+      let commit = await gh.repo.commit(owner, repo, btoa(yaml))
+      console.log(`pushed yaml file and got response`, commit)
+
+      // Open a pull request for branch Publiccode-pusher/add-publiccode-yml
+      let pr = await gh.repo.pulls.open(owner, repo)
+      console.log(`opened PR, got response`, pr)
 
       this.setState({ yaml, loading: false });
     } catch (e) {
