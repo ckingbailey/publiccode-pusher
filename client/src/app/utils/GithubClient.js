@@ -1,6 +1,7 @@
 function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
     let access_token = token
+    const TARGET_BRANCH = 'Publiccode-Pusher/add-publiccode-yaml'
 
     async function fetchJson(url, options) {
         let res = await fetch(url, options)
@@ -42,14 +43,13 @@ function GithubClient(token) {
                 return await fetchJson(target, { method, headers: { Authorization: `token ${access_token}`} })
             },
             push: async function createBranch(owner, repo, baseSha) {
-                let branchName = 'Publiccode-Pusher/add-publiccode-yaml'
                 let target = `https://api.github.com/repos/${owner}/${repo}/git/refs`
                 let method = 'POST'
                 let body = JSON.stringify({
-                    ref: `refs/heads/${branchName}`,
+                    ref: `refs/heads/${TARGET_BRANCH}`,
                     sha: baseSha
                 })
-                if (!access_token) throw Error(`No access token. Cannot add branch ${branchName} to ${target} without authorization.`)
+                if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
                 let headers = {
                     Authorization: `token ${access_token}`,
                     'Content-Type': 'application/json'
@@ -57,14 +57,20 @@ function GithubClient(token) {
                 return await fetchJson(target, { method, body, mode: 'cors', headers })
             }
         },
-        commit: async function commit(owner, repo, message, content, branch) {
+        commit: async function commit(owner, repo, content) {
             let target = `https://api.github.com/repos/${owner}/${repo}/contents/publiccode.yml`
             let method = 'PUT'
-            let body = {
-                message, // message could be canned
+            let body = JSON.stringify({
+                message: 'create publiccode.yml describing this project',
                 content, // base64-encoded YAML
-                branch // branch could be canned
+                branch: TARGET_BRANCH
+            })
+            if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
+            let headers = {
+                Authorization: `token ${access_token}`,
+                'Content-type': 'application/json'
             }
+            return await fetchJson(target, { method, body, mode: 'cors', headers })
         },
         pulls: {
             open: async function openPR(owner, repo) {

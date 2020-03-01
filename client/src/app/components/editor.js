@@ -131,16 +131,6 @@ class Editor extends Component {
     let { values, country, elements } = this.state;
     let obj = ft.transform(values, country, elements);
 
-    // fork, if necessary
-    // create new branch
-    // commit yml file to new branch
-    // open PR for branch
-    // QUESTION: Can I push the object as-is to GH as a .yml file?
-    // ANSWER: No, it's a POJO, not yaml format
-    // ANSWER: The good stuff is produced by the parseYaml function,
-    // which calls jsyaml
-    // That parsed yaml should be pushable to GH
-    // ANSWER, cont'd: er, maybe not. What is this getRemoteYml?
     this.showResults(obj);
   }
 
@@ -366,18 +356,35 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
-  async createNewBranch() {
+  async commitYaml() {
     let gh = new Gh(this.props.token)
     let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
 
     this.props.startRepoFetch()
 
-    let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
-    console.log(`got master branch sha ${baseSha}`)
-    let { object: { sha: newSha }} = await gh.repo.branch.push(owner, repo, baseSha)
-    console.log(`pushed new branch, got back new sha ${newSha}`)
+    try {
+      let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
+      console.log(`got master branch sha ${baseSha}`)
+      let { object: { sha: newSha }} = await gh.repo.branch.push(owner, repo, baseSha)
+      console.log(`pushed new branch, got back new sha ${newSha}`)
 
-    this.props.setNewBranchSHA(newSha)
+      this.props.setNewBranchSHA(newSha)
+
+      // This stuff is all copy+pasted from this.generate() & this.showResults()
+      let { values, country, elements } = this.state;
+      let obj = ft.transform(values, country, elements);
+
+      let mergedValue = { ...staticFieldsJson, ...obj };
+      let tmpYaml = jsyaml.dump(mergedValue);
+      let yaml = staticFieldsYaml + tmpYaml;
+
+      let res = await gh.repo.commit(owner, repo, btoa(yaml))
+      console.log(`pushed yaml file and got response ${res}`)
+
+      this.setState({ yaml, loading: false });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   render() {
@@ -415,7 +422,7 @@ class Editor extends Component {
                 <EditorForm
                   activeSection={activeSection}
                   onAccordion={this.onAccordion.bind(this)}
-                  onSubmit={ () => this.createNewBranch() }
+                  onSubmit={ () => this.commitYaml() }
                   data={blocks}
                   // validate={this.validate.bind(this)}
                   country={country}
