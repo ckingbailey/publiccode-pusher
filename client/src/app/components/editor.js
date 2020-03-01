@@ -4,7 +4,7 @@ import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
 import { unsetAndUnstoreRepo } from '../store/authorize';
-import { getMasterBranchSHA } from '../store/repo';
+import { startFetch, setNewBranchSHA } from '../store/repo';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
@@ -16,12 +16,12 @@ import Head from "./head";
 import Foot from "./foot";
 import EditorForm from "./editorForm";
 import InfoBox from "./InfoBox";
-
 import LanguageSwitcher from "./languageSwitcher";
 import Sidebar from "./sidebar";
 
 import * as ft from "../utils/transform";
 import * as fv from "../utils/validate";
+import Gh from '../utils/GithubClient'
 
 import {staticFieldsJson, staticFieldsYaml} from "../contents/staticFields";
 
@@ -43,7 +43,8 @@ const mapDispatchToProps = dispatch => {
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
     unsetRepo: () => dispatch(unsetAndUnstoreRepo()),
-    getMasterBranchSHA: (token, repo) => dispatch(getMasterBranchSHA(token, repo))
+    startRepoFetch: () => dispatch(startFetch()),
+    setNewBranchSHA: sha => dispatch(setNewBranchSHA(sha))
   };
 };
 
@@ -365,9 +366,18 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
-  getMasterBranch() {
-    console.log(`fire getMasterBranch with repo ${this.props.targetRepo}`)
-    this.props.getMasterBranchSHA(this.props.token, this.props.targetRepo)
+  async createNewBranch() {
+    let gh = new Gh(this.props.token)
+    let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
+
+    this.props.startRepoFetch()
+
+    let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
+    console.log(`got master branch sha ${baseSha}`)
+    let { object: { sha: newSha }} = await gh.repo.branch.push(owner, repo, baseSha)
+    console.log(`pushed new branch, got back new sha ${newSha}`)
+
+    this.props.setNewBranchSHA(newSha)
   }
 
   render() {
@@ -405,7 +415,7 @@ class Editor extends Component {
                 <EditorForm
                   activeSection={activeSection}
                   onAccordion={this.onAccordion.bind(this)}
-                  onSubmit={ () => this.getMasterBranch() }
+                  onSubmit={ () => this.createNewBranch() }
                   data={blocks}
                   // validate={this.validate.bind(this)}
                   country={country}

@@ -41,16 +41,23 @@ function GithubClient(token) {
                 if (!access_token) throw Error(`No access token. Cannot fetch ${target} without authorization.`)
                 return await fetchJson(target, { method, headers: { Authorization: `token ${access_token}`} })
             },
-            push: async function createBranch({ user, repo, name, sha }) {
-                let target = `https://api.github.com/repos/${user}/${repo}/git/refs`
+            push: async function createBranch(owner, repo, baseSha) {
+                let branchName = 'Publiccode-Pusher/add-publiccode-yaml'
+                let target = `https://api.github.com/repos/${owner}/${repo}/git/refs`
                 let method = 'POST'
-                let body = {
-                    ref: `refs/heads/${name}`,
-                    sha
+                let body = JSON.stringify({
+                    ref: `refs/heads/${branchName}`,
+                    sha: baseSha
+                })
+                if (!access_token) throw Error(`No access token. Cannot add branch ${branchName} to ${target} without authorization.`)
+                let headers = {
+                    Authorization: `token ${access_token}`,
+                    'Content-Type': 'application/json'
                 }
+                return await fetchJson(target, { method, body, mode: 'cors', headers })
             }
         },
-        commit: async function commit({ owner, repo, message, content, branch }) {
+        commit: async function commit(owner, repo, message, content, branch) {
             let target = `https://api.github.com/repos/${owner}/${repo}/contents/publiccode.yml`
             let method = 'PUT'
             let body = {
@@ -60,7 +67,7 @@ function GithubClient(token) {
             }
         },
         pulls: {
-            open: async function openPR({ owner, repo }) {
+            open: async function openPR(owner, repo) {
                 let target = `https://api.github.com/repos/${owner}/${repo}/pulls`
                 let method = 'POST'
                 let body = {
