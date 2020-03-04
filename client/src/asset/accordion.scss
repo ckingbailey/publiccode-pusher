@@ -7,20 +7,20 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #fff;
-  color: #ff0000;
+  background: white;
+  color: $color-red;
 }
 
 .rc-collapse {
-  background-color: #fff;
+  background-color: white;
   border-radius: 3px;
-  border: 1px solid #fefefe;
+  border: 1px solid $color-grey-1;
 }
 .rc-collapse-anim-active {
   transition: height 0.2s ease-out;
 }
 .rc-collapse > .rc-collapse-item {
-  border-top: 1px solid #fefefe;
+  border-top: 1px solid $color-grey-1;
 }
 .rc-collapse > .rc-collapse-item:first-child {
   border-top: none;
@@ -30,8 +30,8 @@
   line-height: 56px;
   text-indent: 16px;
   cursor: pointer;
-  border-bottom: 1px solid #e5e5e5;
-  background: #fff;
+  border-bottom: 1px solid $color-grey-2;
+  background: white;
 }
 .rc-collapse > .rc-collapse-item > .rc-collapse-header .arrow {
   display: inline-block;
@@ -42,18 +42,18 @@
   line-height: 0;
   border-top: 3px solid transparent;
   border-bottom: 3px solid transparent;
-  border-left: 4px solid #666;
+  border-left: 4px solid $color-grey-3;
   vertical-align: middle;
   margin-right: 8px;
 }
 .rc-collapse > .rc-collapse-item-disabled > .rc-collapse-header {
   cursor: not-allowed;
-  background-color: #fff;
+  background-color: white;
 }
 .rc-collapse-content {
   overflow: hidden;
   padding: 0 8px;
-  background-color: #fff;
+  background-color: white;
 }
 .rc-collapse-content > .rc-collapse-content-box {
   margin-top: 16px;
@@ -68,27 +68,27 @@
 .rc-collapse > .rc-collapse-item-active > .rc-collapse-header .arrow {
   border-left: 3px solid transparent;
   border-right: 3px solid transparent;
-  border-top: 4px solid #fefefe;
+  border-top: 4px solid $color-grey-1;
   margin-right: 6px;
 }
 
 .rc-collapse-item > .rc-collapse-header {
   font-family: "Titillium Web";
   font-size: 18px;
-  color: #0073e6;
-  background: #fff;
+  color: $color-blue-1;
+  background: white;
 }
 
 .rc-collapse > .rc-collapse-item-active > .rc-collapse-header {
-  color: #fff;
+  color: white;
   border-bottom: none;
-  background: #0066cc;
+  background: $color-blue-2;
 }
 
 .rc-collapse > .rc-collapse-item-active > .rc-collapse-header-error {
-  color: #fff;
+  color: white;
   border-bottom: none;
-  background: #F83E5A;
+  background: $color-red;
 }
 /*
 .rc-collapse

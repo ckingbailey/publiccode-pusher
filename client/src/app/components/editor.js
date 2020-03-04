@@ -7,7 +7,7 @@ import { unsetAndUnstoreRepo } from '../store/authorize';
 import { startFetch, setNewBranchSHA } from '../store/repo';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
-import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
+import jsyaml from "js-yaml";
 
 import _ from "lodash";
 import moment from "moment";
@@ -160,7 +160,6 @@ class Editor extends Component {
     } else {
       yamlLoaded =  false;
     }
-
 
     this.props.notify({ type, title, msg, millis });
     //this.scrollToError(errors)
@@ -356,7 +355,14 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
-  async commitYaml() {
+  async commitYaml(ev) {
+    debugger
+    console.log(`got submit event ${ev}`)
+    debugger
+    ev.preventDefault()
+    debugger
+    ev.stopPropagation()
+    debugger
     let gh = new Gh(this.props.token)
     let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
 
@@ -426,7 +432,7 @@ class Editor extends Component {
                 <EditorForm
                   activeSection={activeSection}
                   onAccordion={this.onAccordion.bind(this)}
-                  onSubmit={ () => this.commitYaml() }
+                  onSubmit={ ev => this.commitYaml(ev) }
                   data={blocks}
                   validate={this.validate.bind(this)}
                   country={country}

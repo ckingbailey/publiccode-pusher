@@ -7,7 +7,8 @@ export const notify = createAction(ADD_NOTIFICATION);
 export const clearNotifications = createAction(RESET_NOTIFICATIONS);
 
 const initialState = {
-  item: null
+  item: null,
+  modal: null
 };
 
 const reducer = handleActions(

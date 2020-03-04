@@ -17,7 +17,7 @@ const initialState = {
     error: null,
     authenticated: false,
     ghAuthToken: null,
-    ghStateToken: null,
+    ghStateToken: '',
     ghCode: null
 }
 
