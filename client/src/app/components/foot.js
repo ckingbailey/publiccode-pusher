@@ -23,7 +23,6 @@ class foot extends Component {
   }
 
   render() {
-    // let { yaml, error, loading, values, form, yamlLoaded } = this.props;
     return (
       <div className="content__foot">
         <div className="content__foot_item">
@@ -38,16 +37,8 @@ class foot extends Component {
           <button
             type="button"
             className="editor_button  editor_button--primary"
-
-            onClick={() => {
-              this.props.submit(APP_FORM);
-              setTimeout(() => {
-                this.props.submitFeedback();
-              }, 250);
-            }}
-          >
-              {this.props.yamlLoaded ? 'Validate' : 'Push to GitHub'}
-          </button>
+            onClick={ () => this.props.submit(APP_FORM) }
+          >Push to GitHub</button>
         </div>
       </div>
     );
@@ -55,4 +46,3 @@ class foot extends Component {
 }
 
 export default foot;
-//disabled={form[APP_FORM].submitFailed && form[APP_FORM].syncErrors}

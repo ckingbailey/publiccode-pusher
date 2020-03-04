@@ -69,7 +69,8 @@ class Editor extends Component {
       activeSection: 0,
       allFields: null,
       lastGen: null,
-      yamlLoaded: false
+      yamlLoaded: false,
+      pullRequestURL: ''
     };
   }
 
@@ -146,13 +147,12 @@ class Editor extends Component {
   }
 
   submitFeedback() {
-    //has state
-    const title = "";
-    const millis = 3000;
+    const millis = 60000;
     const { form } = this.props;
     let { yaml, yamlLoaded } = this.state;
     let type = "success";
-    let msg = "Success";
+    const title = "New Pull Request Opened";
+    let msg = `See your pull request at ${this.state.pullRequestURL}`;
     if (form[APP_FORM].syncErrors) {
       type = "error";
       msg = "There are some errors";
@@ -162,7 +162,6 @@ class Editor extends Component {
     }
 
     this.props.notify({ type, title, msg, millis });
-    //this.scrollToError(errors)
     this.setState({ yaml, yamlLoaded });
   }
 
@@ -217,16 +216,6 @@ class Editor extends Component {
     });
     this.props.notify({ type: "info", msg: "Reset" });
     await this.initData();
-  }
-
-  renderFoot() {
-    //c
-    let props = {
-      reset: this.reset.bind(this),
-      submitFeedback: this.submitFeedback.bind(this),
-      yamlLoaded: this.state.yamlLoaded
-    };
-    return <Foot {...props} />;
   }
 
   renderSidebar() {
@@ -355,14 +344,7 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
-  async commitYaml(ev) {
-    debugger
-    console.log(`got submit event ${ev}`)
-    debugger
-    ev.preventDefault()
-    debugger
-    ev.stopPropagation()
-    debugger
+  async commitYaml(formData) {
     let gh = new Gh(this.props.token)
     let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
 
@@ -370,13 +352,12 @@ class Editor extends Component {
 
     try {
       let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
-      console.log(`got master branch sha ${baseSha}`)
       let { object: { sha: newSha }} = await gh.repo.branch.push(owner, repo, baseSha)
-      console.log(`pushed new branch, got back new sha ${newSha}`)
 
       this.props.setNewBranchSHA(newSha)
 
       // This stuff is all copy+pasted from this.generate() & this.showResults()
+      // TODO: I don't need to access state if I can use the formData that is passed as argument
       let { values, country, elements } = this.state;
       let obj = ft.transform(values, country, elements);
 
@@ -384,12 +365,13 @@ class Editor extends Component {
       let tmpYaml = jsyaml.dump(mergedValue);
       let yaml = staticFieldsYaml + tmpYaml;
 
-      let commit = await gh.repo.commit(owner, repo, btoa(yaml))
-      console.log(`pushed yaml file and got response`, commit)
+      // commit YAML file to the branch Publiccode-pusher/add-publiccode-yml
+      await gh.repo.commit(owner, repo, btoa(yaml))
 
       // Open a pull request for branch Publiccode-pusher/add-publiccode-yml
       let pr = await gh.repo.pulls.open(owner, repo)
-      console.log(`opened PR, got response`, pr)
+      this.setState({ pullRequestURL: pr.url })
+      this.submitFeedback()
 
       this.setState({ yaml, loading: false });
     } catch (e) {
@@ -442,7 +424,7 @@ class Editor extends Component {
                 />
             )}
           </div>
-          {currentLanguage && this.renderFoot()}
+          { currentLanguage && <Foot reset={ this.reset.bind(this) } /> }
           <InfoBox />
         </div>
         {this.renderSidebar()}
