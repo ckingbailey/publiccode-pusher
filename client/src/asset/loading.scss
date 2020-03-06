@@ -1,0 +1,26 @@
+.load-screen__container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    padding-bottom: 3rem;
+}
+
+.load-screen__spinner-container {
+    --element-height: 1rem;
+    height: calc(var(--element-height) * 2)
+}
+
+.load-screen__spinner {
+    display: block;
+    margin-left: auto; margin-right: auto;
+    height: var(--element-height); width: .125rem;
+    background-color: #5a768a;
+    transform-origin: bottom;
+    animation: 3s linear infinite spin;
+}
+
+@keyframes spin {
+    to { rotate: 360deg; }
+}

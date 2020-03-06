@@ -1,25 +1,51 @@
 function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
-    return { get }
+    let access_token = token
+    return { get, setToken }
 
-    function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
+    async function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
         let { url, options } = getRequestParamsForEndpoint(endpoint, data)
-        let res = fetch(url, options)
-        return res
+        let res = await fetch(url, options)
+        let json = await res.json()
+
+        // if bad HTTP repsonse, construct a nice error, and throw it
+        if (!res.ok) {
+            let { message } = json
+            let er = Error(message)
+            er.code = +res.status
+            throw er
+        }
+
+        return json
+    }
+
+    function setToken(token) {
+        access_token = token
     }
 
     function getRequestParamsForEndpoint(endpoint, params) {
         switch (endpoint) {
+            case 'permission':
+                return {
+                    url: `https://api.github.com/repos/${params.owner}/${params.repo}/collaborators/${params.user}/permission`,
+                    options: {
+                        mode: 'cors',
+                        method: 'GET',
+                        headers: {
+                            Authorization: `token ${token}`
+                        }
+                    }
+                }
             case 'token':
                 return {
                     url: TOKEN_SERVER,
                     options: {
-                        mode: 'no-cors',
+                        mode: 'cors',
                         method: 'POST',
                         headers: {
                             'content-type': 'application/x-www-form-urlencoded'
                         },
-                        body: `code=${params.code}&state=${params.stateToken}`
+                        body: `code=${params.code}`
                     }
                 }
             case 'user':
@@ -27,7 +53,7 @@ function GithubClient(token) {
                     url: 'https://api.github.com/user',
                     options: {
                         headers: {
-                            Authorization: `token ${token}`
+                            Authorization: `token ${access_token}`
                         }
                     }
                 }
@@ -36,7 +62,7 @@ function GithubClient(token) {
                     url: `https://api.github.com/users/${params.login}/repos`,
                     options: {
                         headers: {
-                            Authorization: `token ${token}`
+                            Authorization: `token ${access_token}`
                         }
                     }
                 }

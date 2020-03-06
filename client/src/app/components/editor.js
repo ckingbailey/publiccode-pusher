@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
+import { unsetAndUnstoreRepo } from '../store/authorize';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
@@ -28,7 +29,8 @@ const mapStateToProps = state => {
     notifications: state.notifications,
     cache: state.cache,
     form: state.form,
-    yamlLoaded: state.yamlLoaded
+    yamlLoaded: state.yamlLoaded,
+    targetRepo: state.authorize.repo
   };
 };
 
@@ -38,6 +40,7 @@ const mapDispatchToProps = dispatch => {
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
+    unsetRepo: () => dispatch(unsetAndUnstoreRepo())
   };
 };
 
@@ -356,6 +359,11 @@ class Editor extends Component {
     this.setState({ activeSection: activeSection });
   }
 
+  unsetTargetRepo(ev) {
+    ev.preventDefault()
+    this.props.unsetRepo()
+  }
+
   render() {
     let {
       currentLanguage,
@@ -379,7 +387,11 @@ class Editor extends Component {
     return (
       <Fragment>
         <div className="content">
-          <Head lastGen={lastGen} />
+          <Head
+            lastGen={lastGen}
+            targetRepo={ this.props.targetRepo }
+            handleClick={ ev => this.unsetTargetRepo(ev) }
+          />
           {this.langSwitcher()}
           <div className="content__main" id="content__main">
             {currentLanguage &&

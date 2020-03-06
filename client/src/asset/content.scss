@@ -8,12 +8,16 @@ $content-head-h: 120px;
 }
 
 
-.content__head {
+.content__head,
+.content__target-repo {
   padding: 0 $content-pad-horiz;
-  height: $content-head-h;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.content__head {
+  height: $content-head-h;
 }
 
 .content__head__title {
