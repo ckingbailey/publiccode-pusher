@@ -147,7 +147,7 @@ class Editor extends Component {
   }
 
   submitFeedback() {
-    const millis = 60000;
+    const millis = 3600000;
     const { form } = this.props;
     let { yaml, yamlLoaded } = this.state;
     let type = "success";
@@ -344,7 +344,7 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
-  async commitYaml(formData) {
+  async commitYaml() {
     let gh = new Gh(this.props.token)
     let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
 

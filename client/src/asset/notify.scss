@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .notify-container {
   display: flex;
   flex-direction: column;
@@ -20,7 +22,6 @@
 }
 
 .notify-item:hover {
-  opacity: 0.8;
   box-shadow: 0 0 10px 0 rgb(15, 15, 15);
 }
 
@@ -35,7 +36,11 @@
 }
 
 .notify-item.success {
-  background-color: rgba(23, 23, 23, 0.9);
+  width: 68.5vw;
+  height: calc(100vh - (35px * 2));
+  border: 3px solid black;
+  background-color: lighten($success, 50%);
+  color: black;
 }
 
 .notify-item.error {
@@ -45,4 +50,8 @@
 
 .notify-title {
   font-weight: 700;
+}
+
+.notify-item.success .notify-title {
+  font-size: 2rem;
 }

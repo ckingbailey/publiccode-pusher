@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import "../../asset/style.scss";
 import 'react-widgets/dist/css/react-widgets.css';
 import ReactNotify from "react-notify";
-import Modal from './modal';
 import { connect } from "react-redux";
 
 @connect(state => {
