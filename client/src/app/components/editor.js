@@ -374,8 +374,14 @@ class Editor extends Component {
       this.submitFeedback()
 
       this.setState({ yaml, loading: false });
-    } catch (e) {
-      console.error(e);
+    } catch (er) {
+      console.error(er);
+      this.props.notify({
+        type: 'error',
+        title: 'Oops',
+        msg: er.message,
+        millis: 30000
+      })
     }
   }
 

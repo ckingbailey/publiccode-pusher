@@ -40,7 +40,14 @@ function GithubClient(token) {
                 let target = `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branchName}`
                 let method = 'GET'
                 if (!access_token) throw Error(`No access token. Cannot fetch ${target} without authorization.`)
-                return await fetchJson(target, { method, headers: { Authorization: `token ${access_token}`} })
+
+                try {
+                    return await fetchJson(target, { method, headers: { Authorization: `token ${access_token}`} })
+                } catch (er) {
+                    if (er.code === 404) er.message(`${branchName} branch does not exist`)
+
+                    throw er
+                }
             },
             push: async function createBranch(owner, repo, baseSha) {
                 let target = `https://api.github.com/repos/${owner}/${repo}/git/refs`
@@ -54,7 +61,15 @@ function GithubClient(token) {
                     Authorization: `token ${access_token}`,
                     'Content-Type': 'application/json'
                 }
-                return await fetchJson(target, { method, body, mode: 'cors', headers })
+
+                try {
+                    return await fetchJson(target, { method, body, mode: 'cors', headers })
+                } catch (er) {
+                    if (er.message === 'Reference already exists')
+                        er.message = `${TARGET_BRANCH} branch already exists`
+
+                    throw er
+                }
             }
         },
         commit: async function commit(owner, repo, content) {

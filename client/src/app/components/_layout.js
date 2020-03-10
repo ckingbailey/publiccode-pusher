@@ -43,7 +43,6 @@ class Layout extends Component {
     return (
       <div className="wrapper">
         <ReactNotify ref="notificator" />
-        { this.props.notifications.modal && <Modal /> }
         {this.props.children}
       </div>
     );
