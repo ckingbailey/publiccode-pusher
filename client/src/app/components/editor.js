@@ -370,7 +370,6 @@ class Editor extends Component {
       let pr = await gh.repo.pulls.open(owner, repo)
       this.setState({ pullRequestURL: pr.url })
       this.submitFeedback()
-      this.props.finishRepoFetch()
 
       this.setState({ yaml, loading: false });
     } catch (er) {
@@ -381,6 +380,8 @@ class Editor extends Component {
         msg: er.message,
         millis: 30000
       })
+    } finally {
+      this.props.finishRepoFetch()
     }
   }
 
