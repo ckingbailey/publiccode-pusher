@@ -110,7 +110,7 @@
   background-color: #fcfdff;
   color: #5c6f82;
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: #38444f;
     background-color: #fcfdff;
     opacity: 1;

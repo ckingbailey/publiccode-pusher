@@ -3,9 +3,10 @@ import { connect } from "react-redux";
 import { submit } from "redux-form";
 import { APP_FORM } from "../contents/constants";
 
-const mapStateToProps = (state) => {
-  return { form: state.form };
-}
+const mapStateToProps = state => ({
+  form: state.form,
+  fetchingRepo: state.repo.isFetching
+})
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -23,6 +24,13 @@ class foot extends Component {
   }
 
   render() {
+    let submitButton = <button
+      type="button"
+      className={ `editor_button ${this.props.fetchingRepo ? 'editor_button--quaternary' : 'editor_button--primary'}` }
+      disabled={ this.props.fetchingRepo }
+      onClick={ this.props.fetchingRepo ? null : () => this.props.submit(APP_FORM) }
+    >{ this.props.fetchingRepo ? 'Pushing...' : 'Push to GitHub' }</button>
+
     return (
       <div className="content__foot">
         <div className="content__foot_item">
@@ -34,11 +42,7 @@ class foot extends Component {
           </button>
         </div>
         <div className="content__foot_item">
-          <button
-            type="button"
-            className="editor_button  editor_button--primary"
-            onClick={ () => this.props.submit(APP_FORM) }
-          >Push to GitHub</button>
+          { submitButton }
         </div>
       </div>
     );
