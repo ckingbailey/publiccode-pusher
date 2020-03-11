@@ -4,7 +4,7 @@ import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
 import { unsetAndUnstoreRepo } from '../store/authorize';
-import { startFetch, setNewBranchSHA } from '../store/repo';
+import { startFetch, endFetch } from '../store/repo';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
 import jsyaml from "js-yaml";
@@ -44,7 +44,7 @@ const mapDispatchToProps = dispatch => {
     setVersions: data => dispatch(setVersions(data)),
     unsetRepo: () => dispatch(unsetAndUnstoreRepo()),
     startRepoFetch: () => dispatch(startFetch()),
-    setNewBranchSHA: sha => dispatch(setNewBranchSHA(sha))
+    finishRepoFetch: () => dispatch(endFetch())
   };
 };
 
@@ -352,9 +352,7 @@ class Editor extends Component {
 
     try {
       let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
-      let { object: { sha: newSha }} = await gh.repo.branch.push(owner, repo, baseSha)
-
-      this.props.setNewBranchSHA(newSha)
+      await gh.repo.branch.push(owner, repo, baseSha)
 
       // This stuff is all copy+pasted from this.generate() & this.showResults()
       // TODO: I don't need to access state if I can use the formData that is passed as argument
@@ -372,6 +370,7 @@ class Editor extends Component {
       let pr = await gh.repo.pulls.open(owner, repo)
       this.setState({ pullRequestURL: pr.url })
       this.submitFeedback()
+      this.props.finishRepoFetch()
 
       this.setState({ yaml, loading: false });
     } catch (er) {
