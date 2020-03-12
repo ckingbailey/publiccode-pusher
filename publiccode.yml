@@ -1,0 +1,52 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+name: asfd
+url: 'https://something.com'
+releaseDate: '2020-03-13'
+softwareType: standalone/desktop
+platforms:
+  - web
+categories:
+  - accounting
+developmentStatus: development
+maintenance:
+  type: community
+  contacts:
+    - name: asfasdasdf
+legal:
+  license: 0BSD
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - aa
+description:
+  us:
+    genericName: asdf
+    shortDescription: asfdag
+    longDescription: >
+      asldfkj lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfjasldfkj
+      lasjdfl;aksjflkajsfdlk jsakfj  laskdjf lkasdfj
+    features:
+      - asfasdfs
