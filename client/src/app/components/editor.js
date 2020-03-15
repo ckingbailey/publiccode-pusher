@@ -4,9 +4,10 @@ import { initialize, submit } from "redux-form";
 import { notify } from "../store/notifications";
 import { setVersions } from "../store/cache";
 import { unsetAndUnstoreRepo } from '../store/authorize';
+import { startFetch, endFetch } from '../store/repo';
 import { APP_FORM } from "../contents/constants";
 import { getData, SUMMARY } from "../contents/data";
-import jsyaml from "../../../node_modules/js-yaml/dist/js-yaml.js";
+import jsyaml from "js-yaml";
 
 import _ from "lodash";
 import moment from "moment";
@@ -15,12 +16,12 @@ import Head from "./head";
 import Foot from "./foot";
 import EditorForm from "./editorForm";
 import InfoBox from "./InfoBox";
-
 import LanguageSwitcher from "./languageSwitcher";
 import Sidebar from "./sidebar";
 
 import * as ft from "../utils/transform";
 import * as fv from "../utils/validate";
+import Gh from '../utils/GithubClient'
 
 import {staticFieldsJson, staticFieldsYaml} from "../contents/staticFields";
 
@@ -30,7 +31,8 @@ const mapStateToProps = state => {
     cache: state.cache,
     form: state.form,
     yamlLoaded: state.yamlLoaded,
-    targetRepo: state.authorize.repo
+    targetRepo: state.authorize.repo,
+    token: state.authenticate.ghAuthToken
   };
 };
 
@@ -40,7 +42,9 @@ const mapDispatchToProps = dispatch => {
     submit: name => dispatch(submit(name)),
     notify: data => dispatch(notify(data)),
     setVersions: data => dispatch(setVersions(data)),
-    unsetRepo: () => dispatch(unsetAndUnstoreRepo())
+    unsetRepo: () => dispatch(unsetAndUnstoreRepo()),
+    startRepoFetch: () => dispatch(startFetch()),
+    finishRepoFetch: () => dispatch(endFetch())
   };
 };
 
@@ -65,7 +69,8 @@ class Editor extends Component {
       activeSection: 0,
       allFields: null,
       lastGen: null,
-      yamlLoaded: false
+      yamlLoaded: false,
+      pullRequestURL: ''
     };
   }
 
@@ -84,21 +89,16 @@ class Editor extends Component {
   }
 
   async initData(country = null) {
-    //has state
-    // console.log("initData");
     let { elements, blocks, allFields } = await getData(country);
     this.setState({ elements, blocks, country, allFields });
     this.initBootstrap();
   }
 
   parseYml(yaml) {
-    //HAS STATE
     this.setState({ loading: true });
     let obj = null;
     try {
       obj = jsyaml.load(yaml);
-      // let errors =   fv.validatePubliccodeYml(obj);
-      // if (errors) alert(errors);
     } catch (e) {
       alert("Error loading yaml");
       return;
@@ -112,10 +112,7 @@ class Editor extends Component {
 
     // let currentValues = null;
     let currentLanguage = languages ? languages[0] : null;
-    // if (currentLanguage) currentValues = values[currentLanguage];
 
-    //UPDATE STATE
-    // console.log('update state');
     this.setState({
       yaml,
       languages,
@@ -135,10 +132,6 @@ class Editor extends Component {
     let { values, country, elements } = this.state;
     let obj = ft.transform(values, country, elements);
 
-    // fork, if necessary
-    // create new branch
-    // commit yml file to new branch
-    // open PR for branch
     this.showResults(obj);
   }
 
@@ -154,13 +147,12 @@ class Editor extends Component {
   }
 
   submitFeedback() {
-    //has state
-    const title = "";
-    const millis = 3000;
+    const millis = 3600000;
     const { form } = this.props;
     let { yaml, yamlLoaded } = this.state;
     let type = "success";
-    let msg = "Success";
+    const title = "New Pull Request Opened";
+    let msg = `See your pull request at ${this.state.pullRequestURL}`;
     if (form[APP_FORM].syncErrors) {
       type = "error";
       msg = "There are some errors";
@@ -169,9 +161,7 @@ class Editor extends Component {
       yamlLoaded =  false;
     }
 
-
     this.props.notify({ type, title, msg, millis });
-    //this.scrollToError(errors)
     this.setState({ yaml, yamlLoaded });
   }
 
@@ -226,16 +216,6 @@ class Editor extends Component {
     });
     this.props.notify({ type: "info", msg: "Reset" });
     await this.initData();
-  }
-
-  renderFoot() {
-    //c
-    let props = {
-      reset: this.reset.bind(this),
-      submitFeedback: this.submitFeedback.bind(this),
-      yamlLoaded: this.state.yamlLoaded
-    };
-    return <Foot {...props} />;
   }
 
   renderSidebar() {
@@ -364,6 +344,47 @@ class Editor extends Component {
     this.props.unsetRepo()
   }
 
+  async commitYaml() {
+    let gh = new Gh(this.props.token)
+    let [ owner, repo ] = this.props.targetRepo.replace(/https*:\/\/github.com\//, '').split('/')
+
+    this.props.startRepoFetch()
+
+    try {
+      let { object: { sha: baseSha }} = await gh.repo.branch.get(owner, repo, 'master')
+      await gh.repo.branch.push(owner, repo, baseSha)
+
+      // This stuff is all copy+pasted from this.generate() & this.showResults()
+      // TODO: I don't need to access state if I can use the formData that is passed as argument
+      let { values, country, elements } = this.state;
+      let obj = ft.transform(values, country, elements);
+
+      let mergedValue = { ...staticFieldsJson, ...obj };
+      let tmpYaml = jsyaml.dump(mergedValue);
+      let yaml = staticFieldsYaml + tmpYaml;
+
+      // commit YAML file to the branch Publiccode-pusher/add-publiccode-yml
+      await gh.repo.commit(owner, repo, btoa(yaml))
+
+      // Open a pull request for branch Publiccode-pusher/add-publiccode-yml
+      let pr = await gh.repo.pulls.open(owner, repo)
+      this.setState({ pullRequestURL: pr.url })
+      this.submitFeedback()
+
+      this.setState({ yaml, loading: false });
+    } catch (er) {
+      console.error(er);
+      this.props.notify({
+        type: 'error',
+        title: 'Oops',
+        msg: er.message,
+        millis: 30000
+      })
+    } finally {
+      this.props.finishRepoFetch()
+    }
+  }
+
   render() {
     let {
       currentLanguage,
@@ -399,7 +420,7 @@ class Editor extends Component {
                 <EditorForm
                   activeSection={activeSection}
                   onAccordion={this.onAccordion.bind(this)}
-                  onSubmit={this.generate.bind(this)}
+                  onSubmit={ ev => this.commitYaml(ev) }
                   data={blocks}
                   validate={this.validate.bind(this)}
                   country={country}
@@ -409,7 +430,7 @@ class Editor extends Component {
                 />
             )}
           </div>
-          {currentLanguage && this.renderFoot()}
+          { currentLanguage && <Foot reset={ this.reset.bind(this) } /> }
           <InfoBox />
         </div>
         {this.renderSidebar()}

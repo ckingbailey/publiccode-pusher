@@ -1,3 +1,5 @@
+@import "modules/color.scss";
+
 .block__wrapper {
   margin: 10px 0;
 }
@@ -15,8 +17,8 @@
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  background-color: #0066cc;
-  color: #ffffff;
+  background-color: $color-blue-2;
+  color: $color-white;
   font-family: "Roboto Mono";
   font-size: 21px;
   font-weight: 500;
@@ -51,7 +53,7 @@
 }
 
 .block__object {
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid $color-grey-2;
   flex: 1 0 100%;
 }
 
@@ -65,9 +67,9 @@
     right: 20px;
   }
   .block {
-    color: #5c6f82;
-    background-color: #f6f8f8;
-    border-bottom: 1px solid #e8e8e8;
+    color: $color-grey-3;
+    background-color: $color-grey-1;
+    border-bottom: 1px solid $color-grey-2;
   }
 }
 

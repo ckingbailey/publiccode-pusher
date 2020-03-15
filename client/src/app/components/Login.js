@@ -69,8 +69,6 @@ class Login extends Component {
             </div>
         )
 
-        let qs = `client_id=8390933a81635970d3b6&state=${this.props.ghStateToken}&scope=public_repo%20read:user`
-
         return (
             <Fragment>
                 { errorMessage /* TODO: These should both be global */ }
@@ -88,7 +86,7 @@ class Login extends Component {
                             ) : <LoginForm
                                 targetRepo={ this.state.targetRepo }
                                 handleTextInput={ ev => this.handleTextInput(ev) }
-                                qs={ qs }
+                                state={ this.props.ghStateToken }
                               />
                         }
                     </div>

@@ -1,7 +1,22 @@
 function GithubClient(token) {
     const TOKEN_SERVER = 'http://localhost:5000/token'
     let access_token = token
-    return { get, setToken }
+    const TARGET_BRANCH = 'Publiccode-Pusher/add-publiccode-yaml'
+
+    async function fetchJson(url, options) {
+        let res = await fetch(url, options)
+        let json = await res.json()
+
+        if (!res.ok) {
+            let { message } = json // GitHub bad http responses come with nice messages
+            let er = Error(message)
+            er.code = +res.status
+            // TODO: What other useful information comes with a bad GH response?
+            throw er
+        }
+
+        return json
+    }
 
     async function get(endpoint, data) { // I think the answer here is to have this guy take a callback instead
         let { url, options } = getRequestParamsForEndpoint(endpoint, data)
@@ -17,6 +32,79 @@ function GithubClient(token) {
         }
 
         return json
+    }
+
+    const repo = {
+        branch: {
+            get: async function getBranch(owner, repo, branchName) {
+                let target = `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branchName}`
+                let method = 'GET'
+                if (!access_token) throw Error(`No access token. Cannot fetch ${target} without authorization.`)
+
+                try {
+                    return await fetchJson(target, { method, headers: { Authorization: `token ${access_token}`} })
+                } catch (er) {
+                    if (er.code === 404) er.message(`${branchName} branch does not exist`)
+
+                    throw er
+                }
+            },
+            push: async function createBranch(owner, repo, baseSha) {
+                let target = `https://api.github.com/repos/${owner}/${repo}/git/refs`
+                let method = 'POST'
+                let body = JSON.stringify({
+                    ref: `refs/heads/${TARGET_BRANCH}`,
+                    sha: baseSha
+                })
+                if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
+                let headers = {
+                    Authorization: `token ${access_token}`,
+                    'Content-Type': 'application/json'
+                }
+
+                try {
+                    return await fetchJson(target, { method, body, mode: 'cors', headers })
+                } catch (er) {
+                    if (er.message === 'Reference already exists')
+                        er.message = `${TARGET_BRANCH} branch already exists`
+
+                    throw er
+                }
+            }
+        },
+        commit: async function commit(owner, repo, content) {
+            let target = `https://api.github.com/repos/${owner}/${repo}/contents/publiccode.yml`
+            let method = 'PUT'
+            let body = JSON.stringify({
+                message: 'create publiccode.yml describing this project',
+                content, // base64-encoded YAML
+                branch: TARGET_BRANCH
+            })
+            if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
+            let headers = {
+                Authorization: `token ${access_token}`,
+                'Content-type': 'application/json'
+            }
+            return await fetchJson(target, { method, body, mode: 'cors', headers })
+        },
+        pulls: {
+            open: async function openPR(owner, repo) {
+                let target = `https://api.github.com/repos/${owner}/${repo}/pulls`
+                let method = 'POST'
+                let body = JSON.stringify({
+                    title: 'Add publiccode.yml describing this project',
+                    head: TARGET_BRANCH,
+                    base: 'master',
+                    body: 'Add publiccode.yml file describing this project'
+                })
+                if (!access_token) throw Error(`No access token. Cannot add branch ${TARGET_BRANCH} to ${target} without authorization.`)
+                let headers = {
+                    Authorization: `token ${access_token}`,
+                    'Content-Type': 'application/json'
+                }
+                return await fetchJson(target, { method, body, mode: 'cors', headers})
+            }
+        }
     }
 
     function setToken(token) {
@@ -70,6 +158,8 @@ function GithubClient(token) {
                 return null
         }
     }
+
+    return { get, repo, setToken }
 }
 
 GithubClient.generateState = function() {
