@@ -1,0 +1,6 @@
+{
+    "events": {
+        "start": "date '+%H:%M:%S'"
+    },
+    "ignore": [ "client/" ]
+}
