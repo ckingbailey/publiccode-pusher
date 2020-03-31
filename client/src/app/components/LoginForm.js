@@ -7,6 +7,7 @@ const LoginForm = props => (
         onSubmit={ () => sessionStorage.setItem('target_repo', props.targetRepo) }
     > 
         <input type="hidden" name="client_id" value="8390933a81635970d3b6" />
+        <input type="hidden" name="redirect_uri" value={ process.env.REDIRECT_URI } />
         <input type="hidden" name="state" value={ props.state } />
         <input type="hidden" name="scope" value="public_repo read:user" />
         <label htmlFor="target-repo">Enter the full URL of the GitHub repo you want to add a publiccode.yml file to</label>
