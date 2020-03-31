@@ -63,15 +63,32 @@ Run the build step
 npm run build-prod
 ```
 
-This builds to the `dist/` folder. You will then need to push the `dist/` folder to the `gh-pages` branch
+This builds to the `dist/` folder. You will then need to push the `dist/` folder to the `gh-pages` branch.
+
+My current technique for this uses `git worktree`. On first deploy, do:
 ```bash
-git worktree add --detach build
+git worktree add --detach dist
 npm run build-prod
 cd dist
 git checkout -b gh-pages
 git add .
 git commit -m '<message for build commit>'
 git push -u origin gh-pages
+```
+
+On subsequent deploys, do:
+```bash
+git rm -r dist
+git worktree add --detach dist <SHA of HEAD of gh-pages branch>
+cd dist
+git checkout gh-pages
+git reset --hard origin/gh-pages
+cd ..
+npm run build-prod
+cd dist
+git add .
+git commit -m '<message for build commit>'
+git push
 ```
 
 ## The backend is deployed on Google Cloud Platform
