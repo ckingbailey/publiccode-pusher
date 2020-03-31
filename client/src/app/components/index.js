@@ -105,7 +105,7 @@ class Index extends Component {
             // we need to collect a new repo from user
             this.props.setAuthToken(payload)
         } else if (verdict === 'pending') {
-            window.history.replaceState('publiccode-pusher login', '', '/')
+            window.history.replaceState('publiccode-pusher login', '', window.location.pathname)
             window.sessionStorage.removeItem('GH_STATE_TOKEN')
             this.props.exchangeCodeForToken(payload)
         } else {
