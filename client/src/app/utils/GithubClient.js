@@ -1,5 +1,5 @@
 function GithubClient(token) {
-    const TOKEN_SERVER = 'http://localhost:5000/token'
+    const TOKEN_SERVER = `${process.env.TOKEN_SERVER}/token`
     let access_token = token
     const TARGET_BRANCH = 'Publiccode-Pusher/add-publiccode-yaml'
 

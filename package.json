@@ -22,7 +22,7 @@
     "sinon": "^7.5.0"
   },
   "scripts": {
-    "start": "nodemon -i client/",
+    "start": "nodemon",
     "clean": "gulp clean",
     "build": "gulp",
     "test": "mocha",
