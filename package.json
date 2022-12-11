@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "dotenv": "^8.1.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "nodemon": "^1.19.3",
     "redux-thunk": "^2.3.0",
     "request": "^2.88.0",
